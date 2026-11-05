@@ -1,0 +1,6 @@
+@import "./tokens.css";
+@import "./components.css";
+
+/* React migration addition: the prototype overflows horizontally at 320px (decorative hero arcs).
+   Clipping at body level keeps the page from scrolling sideways without changing layout at 390px and up. */
+html, body { overflow-x: clip; }

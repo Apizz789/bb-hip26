@@ -1,0 +1,29 @@
+{
+  "name": "bbl-hi-pro-react",
+  "private": true,
+  "version": "0.1.0",
+  "description": "BBL HI PRO web experience (React + TypeScript migration of the HTML prototype). Mock data only.",
+  "type": "module",
+  "scripts": {
+    "generate:i18n": "node scripts/generate-dictionary.mjs ../preview_p4.html src/i18n/dictionary.ts",
+    "build": "node scripts/build.mjs",
+    "dev": "node scripts/dev.mjs",
+    "typecheck": "tsc -p tsconfig.json",
+    "test:unit": "node --import tsx --test tests/unit/*.test.ts",
+    "test:e2e": "node tests/e2e/run-all.mjs",
+    "test:visual": "node tests/visual/capture.cjs .visual-out && python3 tests/visual/compare.py .visual-out"
+  },
+  "dependencies": {
+    "react": "19.2.8",
+    "react-dom": "19.2.8"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.6",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "esbuild": "0.28.2",
+    "playwright": "1.63.0",
+    "tsx": "4.23.12",
+    "typescript": "6.0.3"
+  }
+}
