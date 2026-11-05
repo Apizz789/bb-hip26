@@ -1,0 +1,2919 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BBL HI PRO — Web Preview</title>
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  /* =========================================================
+     Design tokens
+     ========================================================= */
+  :root{
+    --navy:#0D2B5E; --navy-2:#173C7A; --blue:#1F5BBD; --blue-soft:#E9F0FB;
+    --gold:#C9963A; --green:#1E8A63; --green-soft:#E6F4EE; --red:#B8453F; --red-soft:#FBEDEC;
+    --paper:#F6F5F0; --surface:#FFFFFF; --ink:#141B2D; --muted:#5F6878; --faint:#626B7C; --green-text:#17704F;
+    --line:#E6E4DC; --line-2:#D9D6CC;
+    --radius:16px; --radius-sm:10px; --radius-lg:22px;
+    --shadow:0 1px 2px rgba(13,43,94,.05), 0 12px 28px -18px rgba(13,43,94,.22);
+    --shadow-hover:0 2px 4px rgba(13,43,94,.06), 0 18px 36px -18px rgba(13,43,94,.28);
+    --ease:cubic-bezier(.2,.7,.2,1);
+    --font:"Manrope","Noto Sans Thai",system-ui,-apple-system,"Segoe UI",sans-serif;
+  }
+
+  /* =========================================================
+     Base
+     ========================================================= */
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{-webkit-text-size-adjust:100%}
+  body{font-family:var(--font);background:var(--paper);color:var(--ink);line-height:1.55;min-height:100vh;
+       -webkit-font-smoothing:antialiased;padding-bottom:84px;transition:opacity .18s var(--ease)}
+  body.lang-out{opacity:.35}
+  button,select,input,textarea{font:inherit;color:inherit}
+  button{cursor:pointer;background:none;border:0}
+  a{color:inherit;text-decoration:none}
+  h1,h2,h3{font-weight:800;letter-spacing:-.01em;line-height:1.25}
+  h1{font-size:clamp(1.6rem,2.2vw + 1rem,2.25rem)}
+  h2{font-size:1.15rem}
+  h3{font-size:1rem}
+  .container{max-width:1200px;margin:0 auto;padding:0 20px}
+  .muted{color:var(--muted)}
+  .micro{font-size:0.75rem;color:var(--faint);margin-top:10px}
+  .num{font-variant-numeric:tabular-nums}
+  .ico{width:22px;height:22px;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+  :focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+  .view h1:focus{outline:none}
+  .skip{position:fixed;left:12px;top:-80px;z-index:200;background:var(--navy);color:#fff;padding:10px 14px;border-radius:10px;font-weight:700;transition:top .2s var(--ease)}
+  .skip:focus{top:12px}
+  [hidden]{display:none!important}
+  .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+  /* =========================================================
+     Progress & header
+     ========================================================= */
+  .progress{position:fixed;top:0;left:0;height:2px;width:0;background:var(--blue);z-index:100;opacity:0}
+  .progress.run{animation:progressRun .7s var(--ease)}
+  @keyframes progressRun{0%{width:0;opacity:1}70%{width:85%;opacity:1}100%{width:100%;opacity:0}}
+
+  .app-header{position:sticky;top:0;z-index:40;background:rgba(255,255,255,.92);backdrop-filter:saturate(1.4) blur(10px);
+              border-bottom:1px solid var(--line)}
+  .header-inner{display:flex;align-items:center;gap:24px;height:72px}
+  .wordmark{display:flex;align-items:center;gap:11px;line-height:1.1;min-width:0}
+  .wm-text{display:flex;flex-direction:column}
+  .bm{width:38px;height:38px;flex-shrink:0;display:block}
+  .bm.grow{animation:sprout .75s var(--ease)}
+  @keyframes sprout{0%{transform:translateY(4px) scale(.82);opacity:.4}55%{transform:translateY(-1px) scale(1.07);opacity:1}100%{transform:none}}
+  .bm-s{width:22px;height:22px;display:block}
+  .foot-brand{display:inline-flex;align-items:center;gap:8px;color:var(--navy)}
+  .foot-brand b{letter-spacing:.12em;font-size:0.8125rem}
+  .wm-name{font-weight:800;letter-spacing:.1em;color:var(--navy);font-size:0.9375rem}
+  .wm-sub{font-size:0.75rem;color:var(--faint);margin-top:4px;letter-spacing:.01em}
+
+  .main-nav{display:flex;gap:4px;margin-left:auto}
+  .main-nav a{position:relative;white-space:nowrap;padding:8px 12px;border-radius:999px;color:var(--muted);font-weight:600;font-size:0.9375rem;transition:color .2s,background .2s}
+  .main-nav a:hover{color:var(--navy);background:var(--blue-soft)}
+  .main-nav a.active{color:var(--navy)}
+  .tool-link{white-space:nowrap;font-weight:700;font-size:0.9375rem;color:var(--muted);padding:8px 10px;border-radius:999px;transition:color .2s,background .2s}
+  .hero-intro{margin-top:10px;max-width:46ch;font-size:.875rem;line-height:1.6;color:rgba(255,255,255,.72)}
+  .tool-link:hover{color:var(--navy);background:var(--blue-soft)}
+  .tool-link.active{color:var(--navy)}
+  .soon-tag{margin-left:6px;font-size:0.75rem;font-weight:700;background:#FBF1DE;color:#7A5410;padding:2px 7px;border-radius:999px;vertical-align:middle}
+  .main-nav a.active::after{content:"";position:absolute;left:14px;right:14px;bottom:-2px;height:2px;border-radius:2px;background:var(--navy)}
+
+  .header-tools{display:flex;align-items:center;gap:10px}
+  .lang{display:inline-flex;padding:3px;border-radius:999px;background:#EEF0F4;position:relative}
+  .lang-btn{padding:6px 11px;border-radius:999px;font-size:0.8125rem;font-weight:700;color:var(--muted);transition:background .25s var(--ease),color .25s,box-shadow .25s;white-space:nowrap}
+  .lang-btn[aria-pressed="true"]{background:#fff;color:var(--navy);box-shadow:0 1px 3px rgba(13,43,94,.15)}
+
+  .icon-btn{position:relative;width:40px;height:40px;border-radius:50%;display:grid;place-items:center;color:var(--navy);transition:background .2s}
+  .icon-btn:hover{background:var(--blue-soft)}
+  .icon-btn .dot{position:absolute;top:8px;right:9px;width:8px;height:8px;border-radius:50%;background:var(--red);box-shadow:0 0 0 2px #fff;transition:transform .3s var(--ease)}
+  .icon-btn .dot.off{transform:scale(0)}
+  .notif{position:relative}
+  .notif-panel{position:absolute;right:0;top:50px;width:340px;max-width:calc(100vw - 32px);background:#fff;border-radius:var(--radius);
+               box-shadow:0 24px 50px -20px rgba(13,43,94,.35);border:1px solid var(--line);padding:8px;
+               animation:pop .25s var(--ease);transform-origin:top right}
+  @keyframes pop{from{opacity:0;transform:translateY(-6px) scale(.98)}to{opacity:1;transform:none}}
+  .notif-head{display:flex;justify-content:space-between;align-items:center;padding:10px 12px}
+  .link-btn{font-size:0.8125rem;color:var(--blue);font-weight:700}
+  .link-btn:hover{text-decoration:underline}
+  .notif-list{list-style:none}
+  .notif-item{display:flex;gap:10px;padding:12px;border-radius:12px;cursor:pointer;transition:background .2s}
+  .notif-item:hover{background:var(--paper)}
+  .notif-item .u{width:8px;height:8px;border-radius:50%;background:var(--blue);margin-top:7px;flex-shrink:0}
+  .notif-item.read .u{background:transparent}
+  .notif-item b{font-size:0.9375rem;display:block}
+  .notif-item span{font-size:0.8125rem;color:var(--muted)}
+
+  /* Mobile bottom nav */
+  .bottom-nav{display:none;position:fixed;left:0;right:0;bottom:0;z-index:40;background:rgba(255,255,255,.96);backdrop-filter:blur(10px);
+              border-top:1px solid var(--line);padding:6px 4px calc(6px + env(safe-area-inset-bottom))}
+  .bottom-nav a{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 0;font-size:0.75rem;font-weight:600;color:var(--faint);border-radius:12px;transition:color .2s}
+  .bottom-nav a.active{color:var(--navy)}
+  .bottom-nav a.active .ico{transform:translateY(-1px)}
+  .bottom-nav .ico{transition:transform .25s var(--ease)}
+
+  /* =========================================================
+     Views & transitions
+     ========================================================= */
+  main{padding:28px 0 56px;min-height:calc(100vh - 160px)}
+  .view{display:none;scroll-margin-top:84px}
+  .view.active{display:block;animation:viewIn .5s var(--ease)}
+  @keyframes viewIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+  .view.active .reveal{animation:rise .6s var(--ease) both;animation-delay:calc(var(--i,0) * 70ms + 40ms)}
+  @keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+
+  .page-head{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:24px}
+  .page-head p{color:var(--muted);margin-top:6px;max-width:60ch}
+  .eyebrow{font-size:0.75rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--blue)}
+  .mock-tag{display:inline-flex;align-items:center;gap:6px;font-size:0.75rem;font-weight:700;color:#7A5410;background:#FBF1DE;
+            padding:4px 10px;border-radius:999px;white-space:nowrap}
+  .mock-tag::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--gold)}
+
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:22px;
+        transition:transform .35s var(--ease),box-shadow .35s var(--ease),border-color .35s}
+  .card.lift:hover{transform:translateY(-3px);box-shadow:var(--shadow-hover);border-color:var(--line-2)}
+  .card-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:16px;flex-wrap:wrap}
+  .card-head p{font-size:0.8125rem;color:var(--muted);margin-top:2px}
+
+  .grid{display:grid;gap:18px}
+  .grid-2{grid-template-columns:1fr}
+  .grid-3{grid-template-columns:1fr}
+  .section-block{margin-top:28px}
+  .section-block > h2{margin-bottom:14px}
+
+  /* Buttons */
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 18px;border-radius:var(--radius-sm);
+       font-weight:700;font-size:0.9375rem;transition:background .2s,transform .15s var(--ease),box-shadow .2s,color .2s;white-space:nowrap}
+  .btn:active{transform:scale(.98)}
+  .btn.primary{background:var(--navy);color:#fff;box-shadow:0 6px 14px -8px rgba(13,43,94,.6)}
+  .btn.primary:hover{background:var(--navy-2);box-shadow:0 10px 20px -10px rgba(13,43,94,.7)}
+  .btn.ghost{background:#fff;color:var(--navy);border:1px solid var(--line-2)}
+  .btn.ghost:hover{border-color:var(--navy);background:var(--blue-soft)}
+  .btn.text{color:var(--blue);padding:8px 4px}
+  .btn.text:hover{text-decoration:underline}
+  .btn.full{width:100%}
+  .btn[disabled]{opacity:.5;cursor:not-allowed;transform:none;box-shadow:none}
+  .btn .spin{width:16px;height:16px;border-radius:50%;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;animation:spin .7s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .back{display:inline-flex;align-items:center;gap:6px;font-weight:700;font-size:0.9375rem;color:var(--muted);margin-bottom:18px;padding:6px 10px 6px 4px;border-radius:999px;transition:color .2s,background .2s}
+  .back:hover{color:var(--navy);background:var(--blue-soft)}
+  .back .ico{width:18px;height:18px}
+
+  /* Segmented control */
+  .seg{display:inline-flex;background:#EEF0F4;border-radius:999px;padding:3px;gap:2px}
+  .seg button{padding:6px 14px;border-radius:999px;font-size:0.8125rem;font-weight:700;color:var(--muted);transition:background .25s var(--ease),color .2s}
+  .seg button[aria-pressed="true"]{background:#fff;color:var(--navy);box-shadow:0 1px 3px rgba(13,43,94,.14)}
+
+  .bar{height:8px;background:#ECEBE4;border-radius:999px;overflow:hidden}
+  .bar > i{display:block;height:100%;width:0;background:var(--blue);border-radius:999px;transition:width 1s var(--ease)}
+  .bar.green > i{background:var(--green)}
+  .bar.warn > i{background:var(--red)}
+
+  /* Counters */
+  .count{font-variant-numeric:tabular-nums;font-weight:800;letter-spacing:-.01em}
+
+  /* =========================================================
+     Home
+     ========================================================= */
+  .hero{position:relative;overflow:hidden;background:var(--navy);color:#fff;border-radius:var(--radius-lg);padding:30px 30px 26px;
+        display:grid;gap:26px;box-shadow:0 22px 40px -28px rgba(13,43,94,.7)}
+  .hero::before{content:"";position:absolute;inset:0;background:linear-gradient(120deg,transparent 55%,rgba(255,255,255,.04));pointer-events:none}
+  .hero-arcs{position:absolute;right:-120px;top:-140px;width:420px;height:420px;opacity:.14;pointer-events:none;animation:slowSpin 80s linear infinite}
+  @keyframes slowSpin{to{transform:rotate(360deg)}}
+  .hero .eyebrow{color:#9DBCF2}
+  .hero h1{margin-top:8px;font-size:clamp(1.5rem,2vw + 1rem,2rem)}
+  .hero-sub{color:#C7D6F1;margin-top:6px;max-width:44ch}
+  .hero-balance{border-top:1px solid rgba(255,255,255,.14);padding-top:18px}
+  .hero-balance .label{font-size:0.8125rem;color:#C7D6F1}
+  .hero-balance .count{display:block;font-size:clamp(2rem,3.4vw + 1rem,2.9rem);margin:4px 0 2px}
+  .hero-balance .note{font-size:0.8125rem;color:#9DBCF2}
+
+  .kpis{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:18px}
+  .kpi{padding:18px}
+  .kpi span{font-size:0.8125rem;color:var(--muted);font-weight:600}
+  .kpi .count{display:block;font-size:1.3rem;margin-top:6px}
+  .kpi em{display:block;font-style:normal;font-size:0.75rem;margin-top:4px;color:var(--faint)}
+  .kpi em.up{color:var(--green-text)} .kpi em.down{color:var(--red)}
+
+  .home-grid{margin-top:18px}
+  .legend{display:flex;gap:16px;font-size:0.8125rem;color:var(--muted);align-items:center;margin-bottom:14px;flex-wrap:wrap}
+  .legend span.lbl{display:inline-flex;align-items:center;gap:6px}
+  .sw{width:10px;height:10px;border-radius:3px;display:inline-block}
+  .sw.inc{background:var(--blue)} .sw.exp{background:#C9CFDB}
+
+  .chart{position:relative;height:230px;display:flex;align-items:stretch;gap:6px;padding-top:8px;border-bottom:1px solid var(--line)}
+  .chart .col{flex:1;display:flex;flex-direction:column;align-items:center;gap:8px;min-width:0}
+  .chart .bars{flex:1;width:100%;display:flex;align-items:flex-end;justify-content:center;gap:5px;position:relative}
+  .chart .bars span{width:min(22px,38%);border-radius:7px 7px 3px 3px;transform:scaleY(0);transform-origin:bottom;
+                    transition:transform .9s var(--ease);transition-delay:var(--d,0ms)}
+  .chart .bars .bi{background:var(--blue)}
+  .chart .bars .be{background:#C9CFDB}
+  .chart.grow .bars span{transform:scaleY(1)}
+  .chart .bars span:hover{filter:brightness(1.12)}
+  .chart .m{font-size:0.75rem;color:var(--faint);padding-bottom:6px;white-space:nowrap}
+
+  .goal-card .goal-figs{display:flex;align-items:baseline;gap:10px;margin:6px 0 14px;flex-wrap:wrap}
+  .goal-card .count{font-size:1.9rem}
+  .goal-card .goal-target{color:var(--muted);font-weight:600}
+  .goal-card .bar{margin:6px 0 10px}
+  .goal-card .muted{font-size:0.9375rem}
+  .goal-card .btn{margin-top:16px}
+  .goal-card .goal-title{display:flex;justify-content:space-between;align-items:center;gap:8px}
+
+  .quick-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+  .quick{display:flex;flex-direction:column;align-items:flex-start;gap:14px;padding:18px;border-radius:var(--radius);background:#fff;border:1px solid var(--line);
+         font-weight:700;font-size:0.9375rem;text-align:left;transition:transform .3s var(--ease),border-color .3s,box-shadow .3s;box-shadow:var(--shadow)}
+  .quick:hover{transform:translateY(-3px);border-color:var(--navy);box-shadow:var(--shadow-hover)}
+  .quick .qi{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:var(--blue-soft);color:var(--navy);transition:transform .35s var(--ease)}
+  .quick:hover .qi{transform:rotate(-6deg) scale(1.06)}
+
+  .head-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .goal-kpis{grid-template-columns:1fr}
+  .goal-grid{display:grid;gap:14px;grid-template-columns:1fr;margin-top:6px}
+  .goal-item{display:flex;flex-direction:column;gap:12px}
+  .gi-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+  .gi-name{font-size:1.05rem}
+  .gi-figs{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+  .gi-saved{font-size:1.5rem;font-weight:800}
+  .gi-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:2px}
+  .sel-sm{width:auto;padding:8px 36px 8px 12px;font-size:.875rem;border-radius:var(--radius-sm)}
+  .pill.st-done{background:var(--green-soft);color:var(--green-text)}
+  .pill.st-ontrack{background:var(--blue-soft);color:var(--blue)}
+  .pill.st-behind{background:#FBF1DE;color:#7A5410}
+  .pill.st-overdue{background:var(--red-soft);color:var(--red)}
+  .resume{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-top:18px;border-left:4px solid var(--blue)}
+  .resume-title{font-size:1.05rem;margin-top:4px}
+  .resume p{font-size:0.9375rem;margin-top:2px}
+  .activity{list-style:none;background:#fff;border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
+  .activity li{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 18px;border-top:1px solid var(--line);font-size:0.9375rem;transition:background .2s}
+  .activity li:first-child{border-top:0}
+  .activity li:hover{background:#FBFBF8}
+  .activity .amt{font-weight:800}
+  .activity .amt.in{color:var(--green-text)}
+  .activity .when{font-size:0.8125rem;color:var(--faint)}
+
+  /* =========================================================
+     Services
+     ========================================================= */
+  .svc-grid{display:grid;grid-template-columns:1fr;gap:14px}
+  .svc{display:flex;flex-direction:column;gap:14px;text-align:left;width:100%}
+  .svc .qi{width:46px;height:46px;border-radius:14px;display:grid;place-items:center;background:var(--blue-soft);color:var(--navy);transition:transform .35s var(--ease),background .3s}
+  .svc:hover .qi{transform:translateY(-2px);background:var(--navy);color:#fff}
+  .svc p{color:var(--muted);font-size:0.9375rem;flex:1}
+  .svc .open{display:inline-flex;align-items:center;gap:6px;font-weight:700;font-size:0.9375rem;color:var(--blue)}
+  .svc .open .ico{width:16px;height:16px;transition:transform .3s var(--ease)}
+  .svc:hover .open .ico{transform:translateX(4px)}
+
+  .form-wrap{display:grid;gap:18px}
+  .form-card{padding:26px}
+  .field{display:flex;flex-direction:column;gap:6px;margin-bottom:16px}
+  .field label,.field legend{font-size:0.8125rem;font-weight:700;color:var(--ink)}
+  .field .hint{font-size:0.75rem;color:var(--faint)}
+  .input,.select,.textarea{width:100%;padding:12px 14px;border-radius:var(--radius-sm);border:1px solid var(--line-2);background:#fff;font-size:0.9375rem;
+                           transition:border-color .2s,box-shadow .2s;appearance:none;-webkit-appearance:none}
+  .select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%23141B2D' stroke-width='1.6' stroke-linecap='round'/%3E%3C/svg%3E");
+          background-repeat:no-repeat;background-position:right 14px center;padding-right:38px}
+  .textarea{resize:vertical;min-height:90px}
+  .input:hover,.select:hover,.textarea:hover{border-color:var(--faint)}
+  .input:focus,.select:focus,.textarea:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 4px rgba(31,91,189,.14)}
+  .input.invalid,.select.invalid,.textarea.invalid{border-color:var(--red);box-shadow:0 0 0 4px rgba(184,69,63,.10)}
+  .err-summary{background:var(--red-soft);border:1px solid #F0C6C2;border-radius:var(--radius-sm);padding:12px 14px;color:#7A2A25;font-size:0.9375rem;margin-bottom:18px}
+  .err-summary ul{margin:6px 0 0 18px}
+  .err-summary a{color:inherit;text-decoration:underline;font-weight:600}
+  .err{font-size:0.8125rem;color:var(--red);min-height:0;display:none;animation:rise .3s var(--ease)}
+  .err.show{display:block}
+  .row-2{display:grid;grid-template-columns:1fr;gap:16px}
+
+  .stepper{display:inline-flex;align-items:center;border:1px solid var(--line-2);border-radius:var(--radius-sm);overflow:hidden;background:#fff;width:max-content}
+  .stepper button{width:44px;height:44px;display:grid;place-items:center;color:var(--navy);transition:background .2s}
+  .stepper button:hover{background:var(--blue-soft)}
+  .stepper button:disabled{opacity:.35;cursor:not-allowed;background:none}
+  .stepper input{width:56px;height:44px;text-align:center;border:0;border-left:1px solid var(--line);border-right:1px solid var(--line);font-weight:700;font-size:1rem;-moz-appearance:textfield}
+  .stepper input::-webkit-inner-spin-button,.stepper input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+  .stepper input:focus{outline:none;background:var(--blue-soft)}
+
+  .radio-group{display:grid;gap:10px;border:0}
+  .radio{display:flex;align-items:center;gap:12px;padding:14px;border:1px solid var(--line-2);border-radius:var(--radius-sm);cursor:pointer;background:#fff;transition:border-color .2s,background .2s}
+  .radio:hover{border-color:var(--faint)}
+  .radio input{accent-color:var(--navy);width:18px;height:18px}
+  .radio:has(input:checked){border-color:var(--navy);background:var(--blue-soft)}
+  .radio span{font-weight:600;font-size:0.9375rem}
+
+  .chips-row{display:flex;gap:8px;flex-wrap:wrap}
+  .date-chip{min-width:86px;padding:10px 12px;border-radius:var(--radius-sm);border:1px solid var(--line-2);background:#fff;text-align:center;
+             transition:transform .2s var(--ease),border-color .2s,background .2s,color .2s}
+  .date-chip:hover{border-color:var(--navy);transform:translateY(-1px)}
+  .date-chip small{display:block;font-size:0.75rem;color:var(--faint);font-weight:600;text-transform:uppercase;letter-spacing:.04em}
+  .date-chip strong{display:block;font-size:1.05rem}
+  .date-chip[aria-checked="true"]{background:var(--navy);border-color:var(--navy);color:#fff}
+  .date-chip[aria-checked="true"] small{color:#AFC6EC}
+  .slot{padding:10px 14px;border-radius:999px;border:1px solid var(--line-2);background:#fff;font-weight:700;font-size:0.9375rem;min-width:84px;transition:all .2s var(--ease)}
+  .slot:hover:not([disabled]){border-color:var(--navy)}
+  .slot[aria-checked="true"]{background:var(--blue);border-color:var(--blue);color:#fff;box-shadow:0 8px 16px -10px var(--blue)}
+  .slot[disabled]{color:var(--faint);text-decoration:line-through;background:#F3F3EF;cursor:not-allowed}
+
+  .success{text-align:center;padding:34px 26px;animation:rise .6s var(--ease)}
+  .success .tick{width:64px;height:64px;margin:0 auto 14px;border-radius:50%;background:var(--green-soft);display:grid;place-items:center;color:var(--green)}
+  .success .tick svg{width:30px;height:30px;fill:none;stroke:currentColor;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+  .success .tick path{stroke-dasharray:40;stroke-dashoffset:40}
+  .success.play .tick path{animation:draw .6s .15s var(--ease) forwards}
+  @keyframes draw{to{stroke-dashoffset:0}}
+  .success p{color:var(--muted);margin:6px 0 0}
+  .ref{display:inline-block;margin-top:10px;padding:6px 12px;border-radius:8px;background:#F3F5F9;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:.02em}
+  .success .actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:20px}
+
+  .filter-bar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+  .req-list{list-style:none;display:grid;gap:12px}
+  .req{display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:center;text-align:left;width:100%;padding:18px;background:#fff;border:1px solid var(--line);
+       border-radius:var(--radius);box-shadow:var(--shadow);transition:transform .3s var(--ease),box-shadow .3s,border-color .3s}
+  .req:hover{transform:translateY(-2px);box-shadow:var(--shadow-hover);border-color:var(--line-2)}
+  .req .qi{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;background:var(--blue-soft);color:var(--navy)}
+  .req .meta{font-size:0.8125rem;color:var(--muted);margin-top:2px}
+  .req .ref-s{font-size:0.75rem;color:var(--faint);font-variant-numeric:tabular-nums;margin-top:4px;letter-spacing:.02em}
+  .steps{display:flex;gap:6px;margin-top:10px}
+  .steps i{flex:1;height:4px;border-radius:4px;background:#ECEBE4;transition:background .5s var(--ease)}
+  .steps i.on{background:var(--blue)}
+  .steps i.done{background:var(--green)}
+  .pill{display:inline-flex;align-items:center;font-size:0.75rem;font-weight:700;padding:4px 10px;border-radius:999px;background:#EEF0F4;color:var(--muted);white-space:nowrap}
+  .pill.blue{background:var(--blue-soft);color:var(--blue)}
+  .pill.green{background:var(--green-soft);color:var(--green-text)}
+  .empty{text-align:center;padding:40px 20px;color:var(--muted);border:1px dashed var(--line-2);border-radius:var(--radius);background:#fff}
+
+  /* Overview */
+  .month-nav{display:flex;align-items:center;gap:8px}
+  .month-nav strong{min-width:170px;text-align:center;font-size:1rem}
+  .round{width:40px;height:40px;border-radius:50%;border:1px solid var(--line-2);display:grid;place-items:center;background:#fff;transition:all .2s}
+  .round:hover{border-color:var(--navy);color:var(--navy);background:var(--blue-soft)}
+  .round .ico{width:18px;height:18px}
+  .ov-kpis{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:18px}
+  .ov-kpis .kpi .count{font-size:1.35rem}
+  .donut-wrap{display:grid;gap:22px;align-items:center}
+  .donut{position:relative;width:200px;height:200px;margin:0 auto}
+  .donut svg{width:100%;height:100%;transform:rotate(-90deg)}
+  .donut circle{transition:stroke-dasharray .9s var(--ease),stroke-dashoffset .9s var(--ease),opacity .3s,stroke-width .3s}
+  .donut .center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+  .donut .center small{font-size:0.75rem;color:var(--muted)}
+  .donut .center b{font-size:1.2rem;font-variant-numeric:tabular-nums}
+  .cat-list{list-style:none;display:grid;gap:4px}
+  .cat-list button{width:100%;display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;padding:10px 12px;border-radius:12px;text-align:left;transition:background .2s,opacity .3s}
+  .cat-list button:hover{background:var(--paper)}
+  .cat-list button.dim{opacity:.4}
+  .cat-list .sw{width:12px;height:12px;border-radius:4px}
+  .cat-list .v{font-weight:800;font-variant-numeric:tabular-nums}
+  .cat-list .p{font-size:0.75rem;color:var(--faint)}
+
+  /* Wellness */
+  .ring-wrap{display:flex;align-items:center;gap:22px;flex-wrap:wrap}
+  .ring{position:relative;width:164px;height:164px;flex-shrink:0}
+  .ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+  .ring circle{fill:none;stroke-width:12;stroke-linecap:round}
+  .ring .track{stroke:#ECEBE4}
+  .ring .val{stroke:var(--green);transition:stroke-dashoffset 1.4s var(--ease) .2s}
+  .ring .center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+  .ring .center b{font-size:2.3rem;font-weight:800;font-variant-numeric:tabular-nums;line-height:1}
+  .ring .center small{font-size:0.75rem;color:var(--muted);margin-top:4px}
+  .score-text{flex:1;min-width:200px}
+  .score-text .pill{margin-top:10px}
+  .insights{display:grid;gap:10px;margin-top:18px}
+  .how{margin-top:18px;border:1px solid var(--line);border-radius:var(--radius-sm);padding:12px 16px;background:#fff}
+  .how summary{cursor:pointer;font-weight:700;color:var(--navy);font-size:0.9375rem}
+  .how .small{margin-top:6px}
+  .factor-table{width:100%;border-collapse:collapse;margin-top:12px;font-size:0.9375rem}
+  .factor-table th,.factor-table td{padding:8px 6px;border-bottom:1px solid var(--line);text-align:left}
+  .factor-table th{font-size:0.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+  .factor-table .num{text-align:right;font-variant-numeric:tabular-nums}
+  .factor-table tr.total td{border-bottom:0;padding-top:10px}
+  .ins-act{margin-top:6px}
+  .ins-act .btn.text{padding:4px 0}
+  .insight{border:1px solid var(--line);border-radius:var(--radius-sm);background:#fff;transition:border-color .2s,box-shadow .2s}
+  .insight:hover{border-color:var(--line-2)}
+  .insight[open]{border-color:var(--navy);box-shadow:0 8px 20px -14px rgba(13,43,94,.4)}
+  .insight summary{list-style:none;cursor:pointer;padding:14px 16px;display:flex;justify-content:space-between;align-items:center;gap:12px;font-weight:700;font-size:0.9375rem}
+  .insight summary::-webkit-details-marker{display:none}
+  .insight summary .chev{transition:transform .35s var(--ease);color:var(--faint)}
+  .insight[open] summary .chev{transform:rotate(90deg)}
+  .insight .body{padding:0 16px 14px;color:var(--muted);font-size:0.9375rem;animation:rise .4s var(--ease)}
+  .insight .tag-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-right:-4px}
+  .spend{display:grid;gap:14px}
+  .spend-row{width:100%;text-align:left;display:grid;gap:8px;padding:6px 0}
+  .spend-row .top{display:flex;justify-content:space-between;font-size:0.9375rem;font-weight:600;gap:10px}
+  .spend-row .top span{color:var(--muted);font-weight:500;font-variant-numeric:tabular-nums}
+  .spend-row .detail{font-size:0.8125rem;color:var(--muted);max-height:0;overflow:hidden;transition:max-height .4s var(--ease),opacity .3s;opacity:0}
+  .spend-row.open .detail{max-height:40px;opacity:1}
+  .spend-row .over{color:var(--red);font-weight:700}
+  .recs{display:grid;grid-template-columns:1fr;gap:14px}
+  .rec{display:flex;flex-direction:column;gap:12px;padding:20px;border-radius:var(--radius);border:1px solid var(--line);background:#fff;transition:transform .3s var(--ease),border-color .3s,background .3s}
+  .rec:hover{transform:translateY(-3px);border-color:var(--line-2)}
+  .rec.done{background:var(--green-soft);border-color:#BFE2D2}
+  .rec .n{width:34px;height:34px;border-radius:50%;background:var(--navy);color:#fff;display:grid;place-items:center;font-weight:800;font-size:0.9375rem;transition:background .3s}
+  .rec.done .n{background:var(--green)}
+  .rec p{font-size:0.9375rem;color:var(--muted);flex:1}
+  .rec .btn{align-self:flex-start;padding:9px 14px;font-size:0.8125rem}
+  .rec .btn.text{padding:4px 0}
+  .progress-card .bar{margin:10px 0 6px}
+
+  /* Contact */
+  .contact-grid{display:grid;gap:18px;align-items:start}
+  .profile{display:flex;flex-direction:column;gap:18px}
+  .profile-top{display:flex;align-items:center;gap:16px}
+  .avatar{width:64px;height:64px;border-radius:18px;background:var(--navy);color:#fff;display:grid;place-items:center;font-weight:800;font-size:1.15rem;letter-spacing:.04em;flex-shrink:0}
+  .profile-top h2{font-size:1.2rem}
+  .profile-top p{color:var(--muted);font-size:0.9375rem}
+  .facts{display:grid;gap:0;border-top:1px solid var(--line)}
+  .facts div{display:grid;grid-template-columns:110px 1fr;gap:12px;padding:12px 0;border-bottom:1px solid var(--line);font-size:0.9375rem}
+  .facts dt{color:var(--muted);font-weight:600}
+  .facts dd{font-weight:700}
+  .intro h3{margin-bottom:6px}
+  .intro p{color:var(--muted);font-size:0.9375rem}
+  .count-chars{font-size:0.75rem;color:var(--faint);text-align:right;margin-top:-10px;margin-bottom:14px;font-variant-numeric:tabular-nums}
+  .proto-note{font-size:0.8125rem;color:var(--faint);display:flex;gap:8px;align-items:flex-start;margin-top:4px}
+  .proto-note .ico{width:16px;height:16px;margin-top:2px}
+
+  /* Playground placeholder */
+  .soon{position:relative;overflow:hidden;text-align:center;padding:64px 28px;border-radius:var(--radius-lg);background:#fff;border:1px solid var(--line);box-shadow:var(--shadow)}
+  .soon .rings{position:absolute;left:50%;top:44%;width:320px;height:320px;transform:translate(-50%,-50%);pointer-events:none}
+  .soon .rings circle{fill:none;stroke:var(--blue-soft);stroke-width:1.5;transform-box:fill-box;transform-origin:center;animation:ripple 4s var(--ease) infinite}
+  .soon .rings circle:nth-child(2){animation-delay:1.3s}
+  .soon .rings circle:nth-child(3){animation-delay:2.6s}
+  @keyframes ripple{0%{opacity:0;transform:scale(.6)}30%{opacity:1}100%{opacity:0;transform:scale(1.15)}}
+  .soon .content{position:relative;max-width:460px;margin:0 auto}
+  .soon .mark{width:72px;height:72px;margin:0 auto 18px}
+  .soon .mark svg{width:100%;height:100%;display:block}
+  .soon p{color:var(--muted);margin:10px 0 24px}
+
+  /* Brand */
+  .brand-grid{display:grid;gap:18px;grid-template-columns:1fr}
+  .brand-intro{display:flex;align-items:center;gap:20px;grid-column:1/-1}
+  .brand-intro h2{font-size:1.1rem}
+  .brand-intro p{font-size:0.9375rem;margin-top:4px}
+  .bm-xl{width:112px;height:112px;flex-shrink:0;display:block}
+  .variant{height:200px;border-radius:var(--radius-sm);display:grid;place-items:center;margin-top:14px;border:1px solid var(--line)}
+  .variant.light{background:var(--paper)}
+  .variant.dark{background:#0D2B5E;border-color:#0D2B5E}
+  .sizes{display:flex;align-items:flex-end;gap:22px;margin-top:14px;flex-wrap:wrap}
+  .sizes figure{display:grid;justify-items:center;gap:8px}
+  .sizes figcaption{font-size:0.75rem;color:var(--faint);font-variant-numeric:tabular-nums}
+  .small{font-size:0.9375rem;margin-top:4px}
+  .tabmock{margin-top:14px;background:var(--paper);border:1px solid var(--line);border-radius:10px 10px 0 0;padding:8px 10px 0;display:inline-flex}
+  .tab{display:inline-flex;align-items:center;gap:8px;background:#fff;border-radius:8px 8px 0 0;padding:6px 12px;font-size:0.8125rem;font-weight:600;color:var(--navy);box-shadow:0 1px 2px rgba(13,43,94,.08)}
+  .rules{list-style:none;margin-top:12px;display:grid;gap:10px}
+  .rules li{position:relative;padding-left:20px;font-size:0.9375rem;color:var(--muted)}
+  .rules li::before{content:"";position:absolute;left:0;top:.6em;width:8px;height:8px;border-radius:50%;background:var(--green)}
+  .brand-note{font-size:0.8125rem;color:var(--muted);border-left:3px solid var(--gold);padding:6px 0 6px 14px}
+
+  /* Footer */
+  .site-foot{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-top:40px;padding-top:20px;border-top:1px solid var(--line);font-size:0.8125rem;color:var(--faint)}
+  .site-foot nav{display:flex;gap:16px}
+  .site-foot a:hover{color:var(--navy);text-decoration:underline}
+
+  /* Modal */
+  .modal{position:fixed;inset:0;z-index:80;background:rgba(14,28,56,.42);display:grid;place-items:center;padding:16px;backdrop-filter:blur(3px);animation:fadeIn .25s var(--ease)}
+  @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+  .modal-box{background:#fff;border-radius:var(--radius-lg);width:min(460px,100%);padding:26px;position:relative;box-shadow:0 40px 80px -30px rgba(10,20,50,.5);animation:modalIn .35s var(--ease)}
+  @keyframes modalIn{from{opacity:0;transform:translateY(14px) scale(.98)}to{opacity:1;transform:none}}
+  .modal-box h3{font-size:1.15rem;padding-right:36px}
+  .modal-x{position:absolute;top:14px;right:14px;width:36px;height:36px;border-radius:50%;display:grid;place-items:center;color:var(--muted)}
+  .modal-x:hover{background:var(--paper);color:var(--ink)}
+  .modal-body{margin-top:14px;color:var(--muted);font-size:0.9375rem}
+  .summary{display:grid;gap:0;margin-top:12px;border:1px solid var(--line);border-radius:var(--radius-sm);overflow:hidden}
+  .summary div{display:flex;justify-content:space-between;gap:12px;padding:10px 14px;border-top:1px solid var(--line);font-size:0.9375rem}
+  .summary div:first-child{border-top:0}
+  .summary b{color:var(--ink);text-align:right}
+  .modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:20px;flex-wrap:wrap}
+  .timeline{list-style:none;margin-top:14px;display:grid;gap:0}
+  .timeline li{display:grid;grid-template-columns:22px 1fr;gap:12px;position:relative;padding-bottom:16px}
+  .timeline li:last-child{padding-bottom:0}
+  .timeline li::before{content:"";position:absolute;left:10px;top:22px;bottom:0;width:2px;background:var(--line)}
+  .timeline li:last-child::before{display:none}
+  .timeline li.done::before{background:var(--green)}
+  .timeline .dot{width:22px;height:22px;border-radius:50%;border:2px solid var(--line-2);background:#fff;display:grid;place-items:center}
+  .timeline li.done .dot{background:var(--green);border-color:var(--green);color:#fff}
+  .timeline li.now .dot{border-color:var(--blue);box-shadow:0 0 0 4px var(--blue-soft)}
+  .timeline .dot .ico{width:12px;height:12px;stroke-width:3}
+  .timeline b{font-size:0.9375rem;color:var(--ink)}
+  .timeline small{display:block;color:var(--faint);font-size:0.8125rem}
+
+  .toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,20px);background:var(--navy);color:#fff;padding:12px 18px;border-radius:14px;
+         font-size:0.9375rem;font-weight:600;box-shadow:0 18px 40px -16px rgba(10,20,50,.6);opacity:0;pointer-events:none;z-index:90;
+         transition:opacity .3s var(--ease),transform .3s var(--ease);max-width:calc(100vw - 32px);text-align:center}
+  .toast.show{opacity:1;transform:translate(-50%,0)}
+
+  /* =========================================================
+     Responsive
+     ========================================================= */
+  @media (min-width:640px){
+    .kpis.goal-kpis{grid-template-columns:repeat(3,1fr)}
+    .goal-grid{grid-template-columns:repeat(2,1fr)}
+    .kpis{grid-template-columns:repeat(4,1fr)}
+    .quick-grid{grid-template-columns:repeat(4,1fr)}
+    .svc-grid{grid-template-columns:repeat(2,1fr)}
+    .row-2{grid-template-columns:1fr 1fr}
+    .recs{grid-template-columns:repeat(3,1fr)}
+    .ov-kpis{grid-template-columns:repeat(4,1fr)}
+    .form-card{padding:30px}
+  }
+  @media (min-width:960px) and (max-width:1219px){
+    .wm-sub{display:none}
+    .main-nav{gap:0}
+    .main-nav a{padding:8px 9px;font-size:0.8125rem}
+    .header-inner{gap:14px}
+  }
+  @media (min-width:960px){
+    main{padding-top:36px}
+    .container{padding:0 32px}
+    .grid-2{grid-template-columns:1.4fr 1fr}
+    .grid-3{grid-template-columns:repeat(3,1fr)}
+    .hero{grid-template-columns:1.3fr 1fr;align-items:end;padding:36px 38px 32px}
+    .hero-balance{border-top:0;border-left:1px solid rgba(255,255,255,.14);padding:0 0 4px 30px;align-self:stretch;display:flex;flex-direction:column;justify-content:center}
+    .svc-grid{grid-template-columns:repeat(3,1fr)}
+    .svc-grid .svc:first-child{grid-column:span 1}
+    .donut-wrap{grid-template-columns:260px 1fr}
+    .donut{width:240px;height:240px}
+    .contact-grid{grid-template-columns:380px 1fr}
+    .brand-grid{grid-template-columns:1fr 1fr}
+    .ring-wrap{flex-wrap:nowrap}
+  }
+  @media (max-width:719px){
+    .main-nav{display:none}
+    .tool-link{display:none}
+    .bottom-nav{display:flex}
+    .wm-sub{display:none}
+    .header-inner{height:64px;gap:12px}
+    .wordmark{min-width:0}
+    .lang-btn{padding:6px 9px}
+    body{padding-bottom:88px}
+    main{padding-top:20px}
+    .chart{height:200px}
+    .month-nav strong{min-width:140px;font-size:0.9375rem}
+    .facts div{grid-template-columns:90px 1fr}
+  }
+  @media (max-width:380px){
+    .wm-name{font-size:0.8125rem;letter-spacing:.1em}
+  }
+  @media (max-width:959px){
+    .main-nav{display:none}
+    .tool-link{display:none}
+    .bottom-nav{display:flex}
+    body{padding-bottom:88px}
+    .lang-btn{min-height:40px;min-width:44px}
+    .view button:not(.skip), .view .btn, .view a.btn, .view .back, .view a.back{min-height:44px}
+    .view .seg button, .view .month-nav button{min-width:44px;min-height:44px}
+    .view input[type=checkbox], .view input[type=radio]{width:22px;height:22px}
+    .bottom-nav a{min-height:56px}
+  }
+
+  /* Phase 4: loading screen + skeletons */
+  .splash{position:fixed;inset:0;z-index:100;background:var(--paper);display:grid;place-items:center;transition:opacity .45s var(--ease),visibility .45s}
+  .splash.done{opacity:0;visibility:hidden;pointer-events:none}
+  .splash-in{display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;padding:20px}
+  .splash-mark{width:76px;height:76px;animation:markIn .6s var(--ease) both}
+  .splash-name{font-weight:800;letter-spacing:.14em;color:var(--navy);font-size:.9375rem;margin-top:6px}
+  .splash-msg{font-size:.8125rem;color:var(--muted)}
+  .splash-bar{width:160px;height:4px;border-radius:999px;background:#ECEBE4;overflow:hidden;margin-top:8px}
+  .splash-bar i{display:block;height:100%;width:0;background:var(--blue);border-radius:999px;animation:splashBar .9s var(--ease) forwards}
+  @keyframes markIn{from{opacity:0;transform:scale(.85)}to{opacity:1;transform:none}}
+  @keyframes splashBar{to{width:100%}}
+  @keyframes shimmer{from{background-position:100% 0}to{background-position:-100% 0}}
+  .skel-wrap{display:grid;gap:14px;padding-top:6px}
+  .skel{background:linear-gradient(90deg,#ECEBE4 25%,#F7F6F1 50%,#ECEBE4 75%);background-size:200% 100%;animation:shimmer 1.2s linear infinite;border-radius:10px}
+  .skel.h{height:34px;width:min(340px,70%)}
+  .skel.s{height:14px;width:45%}
+  .skel.chip{height:36px;width:110px;border-radius:999px}
+  .skel.kpi{height:92px;border-radius:var(--radius)}
+  .skel.card{height:150px;border-radius:var(--radius)}
+  .skel.tall{height:260px;border-radius:var(--radius)}
+  .skel.row{height:64px;border-radius:var(--radius-sm)}
+  .skel-row{display:grid;gap:12px;grid-template-columns:1fr}
+  .view.is-loading > :not(.skel-wrap){display:none}
+  @media (min-width:640px){
+    .skel-row.k3{grid-template-columns:repeat(3,1fr)}
+    .skel-row.k4{grid-template-columns:repeat(4,1fr)}
+    .skel-row.c2{grid-template-columns:1fr 1fr}
+  }
+
+  /* Phase 3: view transition + feedback */
+  @keyframes viewIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  @keyframes goalBump{0%{box-shadow:0 0 0 0 rgba(30,138,99,.35)}100%{box-shadow:0 0 0 14px rgba(30,138,99,0)}}
+  .view.active{animation:viewIn .3s var(--ease)}
+  .goal-item.bump,.goal-card.bump{animation:goalBump .6s var(--ease)}
+  .btn:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+  @media (max-width:639px){ .kpis.goal-kpis{grid-template-columns:repeat(3,1fr);gap:8px} .goal-kpis .kpi{padding:14px 12px} .goal-kpis .kpi strong{font-size:1.0625rem} .goal-kpis .kpi span{font-size:.75rem} }
+  @media (max-width:959px){ .view .btn.text{min-width:44px;display:inline-flex;align-items:center;justify-content:center} }
+
+  /* =========================================================
+     Reduced motion
+     ========================================================= */
+  @media (prefers-reduced-motion:reduce){
+    *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
+    .hero-arcs,.soon .rings circle{animation:none!important}
+  }
+</style>
+</head>
+<body>
+<div class="splash" id="splash" role="status" aria-live="polite">
+  <div class="splash-in">
+    <svg class="splash-mark" viewBox="0 0 64 64" aria-hidden="true"><use href="#bm-light"/></svg>
+    <p class="splash-name">BBL HI PRO</p>
+    <p class="splash-msg" data-i18n="splash_msg"></p>
+    <div class="splash-bar" aria-hidden="true"><i></i></div>
+  </div>
+</div>
+
+<button class="skip" id="skipBtn" type="button" data-i18n="skip"></button>
+
+<!-- SVG sprite: UI icons (stroke-based, inherit currentColor) -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <!-- Brand mark: Concept B · Growth Garden (selected) -->
+  <symbol id="bm-light" viewBox="0 0 64 64">
+    <rect width="64" height="64" rx="16" fill="#E7F3EC"/>
+    <path d="M32 52V32" fill="none" stroke="#1E8A63" stroke-width="4.5" stroke-linecap="round"/>
+    <path d="M32 38C22 38 16 30 16 20c11 0 16 7 16 18z" fill="#1E8A63"/>
+    <path d="M32 31C32 20 39 12 49 12c0 11-7 19-17 19z" fill="#3FB58A"/>
+    <path d="M14 52h36" fill="none" stroke="#0D2B5E" stroke-width="3.5" stroke-linecap="round" opacity=".55"/>
+  </symbol>
+  <symbol id="bm-dark" viewBox="0 0 64 64">
+    <rect width="64" height="64" rx="16" fill="#0D2B5E"/>
+    <path d="M32 52V32" fill="none" stroke="#9EE3C5" stroke-width="4.5" stroke-linecap="round"/>
+    <path d="M32 38C22 38 16 30 16 20c11 0 16 7 16 18z" fill="#9EE3C5"/>
+    <path d="M32 31C32 20 39 12 49 12c0 11-7 19-17 19z" fill="#D4F5E6"/>
+    <path d="M14 52h36" fill="none" stroke="#E7F3EC" stroke-width="3.5" stroke-linecap="round" opacity=".45"/>
+  </symbol>
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="M4 11l8-6 8 6M6 10v9h12v-9"/></symbol>
+  <symbol id="i-grid" viewBox="0 0 24 24"><path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z"/></symbol>
+  <symbol id="i-heart" viewBox="0 0 24 24"><path d="M5 19c0-8 6-13 14-14-1 8-6 14-14 14zM5 19l7-7"/></symbol>
+  <symbol id="i-layers" viewBox="0 0 24 24"><path d="M12 4l8 4-8 4-8-4zM4 12l8 4 8-4M4 16l8 4 8-4"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c1-4 4-6 8-6s7 2 8 6"/></symbol>
+  <symbol id="i-bell" viewBox="0 0 24 24"><path d="M6 16v-5a6 6 0 0112 0v5l2 2H4zM10 20a2 2 0 004 0"/></symbol>
+  <symbol id="i-doc" viewBox="0 0 24 24"><path d="M7 3h7l5 5v13H7zM14 3v5h5M10 13h6M10 17h6"/></symbol>
+  <symbol id="i-cal" viewBox="0 0 24 24"><path d="M4 6h16v14H4zM4 10h16M8 3v4M16 3v4"/></symbol>
+  <symbol id="i-track" viewBox="0 0 24 24"><path d="M5 7l2 2 3-3M5 16l2 2 3-3M13 7h6M13 16h6"/></symbol>
+  <symbol id="i-chart" viewBox="0 0 24 24"><path d="M4 20h16M7 16v-5M12 16V8M17 16v-9"/></symbol>
+  <symbol id="i-back" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></symbol>
+  <symbol id="i-right" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7"/></symbol>
+  <symbol id="i-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+  <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 018 0v3"/></symbol>
+</svg>
+
+<div class="progress" id="progress" aria-hidden="true"></div>
+
+<header class="app-header">
+  <div class="container header-inner">
+    <a class="wordmark" href="#home" aria-label="BBL HI PRO">
+      <svg class="bm" viewBox="0 0 64 64" aria-hidden="true"><use href="#bm-light"/></svg>
+      <span class="wm-text">
+        <span class="wm-name">BBL HI PRO</span>
+        <span class="wm-sub" data-i18n="brand_sub"></span>
+      </span>
+    </a>
+
+    <nav class="main-nav" aria-label="Main">
+      <a href="#home" data-nav="home" data-i18n="nav_home"></a>
+      <a href="#services" data-nav="services" data-i18n="nav_services"></a>
+      <a href="#wellness" data-nav="wellness" data-i18n="nav_wellness"></a>
+      <a href="#goals" data-nav="goals" data-i18n="nav_goals"></a>
+      <a href="#playground" data-nav="playground"><span data-i18n="nav_playground"></span><span class="soon-tag" data-i18n="soon"></span></a>
+    </nav>
+
+    <div class="header-tools">
+      <a class="tool-link" href="#contact" data-nav="contact" data-i18n="nav_contact"></a>
+      <div class="lang" role="group" data-i18n-aria="aria_lang" aria-label="Language">
+        <button class="lang-btn" data-lang="th" aria-pressed="true">🇹🇭 TH</button>
+        <button class="lang-btn" data-lang="en" aria-pressed="false">🇬🇧 EN</button>
+      </div>
+
+      <div class="notif">
+        <button class="icon-btn" id="bellBtn" aria-haspopup="true" aria-expanded="false" data-i18n-aria="notif_title" aria-label="Notifications">
+          <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-bell"/></svg>
+          <span class="dot" id="bellDot"></span>
+        </button>
+        <div class="notif-panel" id="notifPanel" hidden>
+          <div class="notif-head">
+            <b data-i18n="notif_title"></b>
+            <button class="link-btn" id="markRead" data-i18n="notif_markall"></button>
+          </div>
+          <ul class="notif-list" id="notifList"></ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="container" id="app">
+
+  <!-- ================= HOME ================= -->
+  <section class="view" id="home" aria-labelledby="homeTitle">
+    <div class="hero reveal">
+      <svg class="hero-arcs" viewBox="0 0 400 400" aria-hidden="true">
+        <g fill="none" stroke="#fff" stroke-width="1">
+          <circle cx="200" cy="200" r="60"/><circle cx="200" cy="200" r="100"/>
+          <circle cx="200" cy="200" r="140"/><circle cx="200" cy="200" r="180"/>
+        </g>
+      </svg>
+      <div>
+        <p class="eyebrow" id="greet"></p>
+        <h1 id="homeTitle"></h1>
+        <p class="hero-sub" data-i18n="home_sub"></p>
+        <p class="hero-intro" data-i18n="home_intro"></p>
+      </div>
+      <div class="hero-balance">
+        <span class="label" data-i18n="home_balance"></span>
+        <strong class="count" id="cBalance" data-count="152430.5" data-kind="money">฿0.00</strong>
+        <span class="note" data-i18n="home_balance_note"></span>
+      </div>
+    </div>
+
+    <section class="resume card reveal" aria-labelledby="resumeEyebrow">
+      <div>
+        <span class="eyebrow" id="resumeEyebrow" data-i18n="resume_t"></span>
+        <p class="resume-title" id="resumeTitle"></p>
+        <p class="muted" id="resumeMeta"></p>
+      </div>
+      <button class="btn primary" id="resumeBtn" type="button"></button>
+    </section>
+
+    <div class="kpis reveal">
+      <div class="card kpi lift"><span data-i18n="home_income"></span><strong class="count" id="cIncome" data-count="45000" data-kind="money">฿0</strong><em class="up" data-i18n="home_income_note"></em></div>
+      <div class="card kpi lift"><span data-i18n="home_expenses"></span><strong class="count" id="cExpense" data-count="28760" data-kind="money">฿0</strong><em class="down" data-i18n="home_expense_note"></em></div>
+      <div class="card kpi lift"><span data-i18n="home_net"></span><strong class="count" id="cNet" data-count="16240" data-kind="money">฿0</strong><em data-i18n="home_net_note"></em></div>
+      <div class="card kpi lift"><span data-i18n="home_rate"></span><strong class="count" id="cRate" data-count="36" data-kind="pct">0%</strong><em data-i18n="home_rate_note"></em></div>
+    </div>
+
+    <div class="grid grid-2 home-grid">
+      <article class="card reveal" aria-labelledby="chartTitle">
+        <div class="card-head">
+          <div>
+            <h2 id="chartTitle" data-i18n="home_cashflow"></h2>
+            <p data-i18n="home_cashflow_sub"></p>
+          </div>
+          <div class="seg" role="group" aria-label="Range">
+            <button data-range="6" aria-pressed="true" data-i18n="period_6m"></button>
+            <button data-range="12" aria-pressed="false" data-i18n="period_12m"></button>
+          </div>
+        </div>
+        <div class="legend">
+          <span class="lbl"><i class="sw inc"></i><span data-i18n="legend_income"></span></span>
+          <span class="lbl"><i class="sw exp"></i><span data-i18n="legend_expenses"></span></span>
+          <span class="mock-tag" style="margin-left:auto" data-i18n="mock_label"></span>
+        </div>
+        <div class="chart" id="chart"></div>
+      </article>
+
+      <article class="card reveal goal-card" aria-labelledby="goalTitle">
+        <div class="goal-title">
+          <h2 id="goalTitle" data-i18n="home_goal_title"></h2>
+          <span class="pill blue" data-i18n="home_goal_tag"></span>
+        </div>
+        <div class="goal-figs">
+          <strong class="count" id="cGoal" data-count="18500" data-kind="baht">฿0</strong>
+          <span class="goal-target" id="goalTarget"></span>
+        </div>
+        <div class="bar" role="progressbar" aria-labelledby="goalTitle" aria-valuemin="0" aria-valuemax="100"><i id="goalBar"></i></div>
+        <p id="goalRemain" style="margin-top:12px"></p>
+        <button class="btn primary full" id="goalAdd"></button>
+        <button class="btn text" type="button" data-go="goals" data-i18n="goals_all" style="margin-top:8px"></button>
+        <p class="micro" data-i18n="sim_note"></p>
+      </article>
+    </div>
+
+    <section class="section-block reveal" aria-labelledby="quickTitle">
+      <h2 id="quickTitle" data-i18n="home_quick"></h2>
+      <div class="quick-grid">
+        <button class="quick" data-go="svc-documents">
+          <span class="qi"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-doc"/></svg></span>
+          <span data-i18n="quick_docs"></span>
+        </button>
+        <button class="quick" data-go="svc-appointment">
+          <span class="qi"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-cal"/></svg></span>
+          <span data-i18n="quick_appt"></span>
+        </button>
+        <button class="quick" data-go="svc-tracking">
+          <span class="qi"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-track"/></svg></span>
+          <span data-i18n="quick_track"></span>
+        </button>
+        <button class="quick" data-go="wellness">
+          <span class="qi"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-heart"/></svg></span>
+          <span data-i18n="quick_wellness"></span>
+        </button>
+      </div>
+    </section>
+
+    <section class="section-block reveal" aria-labelledby="actTitle">
+      <h2 id="actTitle" data-i18n="home_activity"></h2>
+      <ul class="activity" id="activity"></ul>
+    </section>
+  </section>
+
+  <!-- ================= SERVICES ================= -->
+  <section class="view" id="services" aria-labelledby="svcTitle">
+    <div class="page-head reveal">
+      <div>
+        <p class="eyebrow" data-i18n="nav_services"></p>
+        <h1 id="svcTitle" data-i18n="svc_title"></h1>
+        <p data-i18n="svc_sub"></p>
+      </div>
+      <span class="mock-tag" data-i18n="mock_label"></span>
+    </div>
+    <div class="svc-grid">
+      <button class="card lift svc reveal" data-go="svc-documents">
+        <span class="qi"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-doc"/></svg></span>
+        <h3 data-i18n="svc_docs_t"></h3>
+        <p data-i18n="svc_docs_d"></p>
+        <span class="open"><span data-i18n="open"></span><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-right"/></svg></span>
+      </button>
+      <button class="card lift svc reveal" data-go="svc-appointment">
+        <span class="qi"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-cal"/></svg></span>
+        <h3 data-i18n="svc_appt_t"></h3>
+        <p data-i18n="svc_appt_d"></p>
+        <span class="open"><span data-i18n="open"></span><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-right"/></svg></span>
+      </button>
+      <button class="card lift svc reveal" data-go="svc-tracking">
+        <span class="qi"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-track"/></svg></span>
+        <h3 data-i18n="svc_track_t"></h3>
+        <p data-i18n="svc_track_d"></p>
+        <span class="open"><span data-i18n="open"></span><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-right"/></svg></span>
+      </button>
+      <button class="card lift svc reveal" data-go="svc-overview">
+        <span class="qi"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-chart"/></svg></span>
+        <h3 data-i18n="svc_overview_t"></h3>
+        <p data-i18n="svc_overview_d"></p>
+        <span class="open"><span data-i18n="open"></span><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-right"/></svg></span>
+      </button>
+      <button class="card lift svc reveal" data-go="wellness">
+        <span class="qi"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-heart"/></svg></span>
+        <h3 data-i18n="svc_wellness_t"></h3>
+        <p data-i18n="svc_wellness_d"></p>
+        <span class="open"><span data-i18n="open"></span><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-right"/></svg></span>
+      </button>
+    </div>
+  </section>
+
+  <!-- ---- Document request ---- -->
+  <section class="view" id="svc-documents" aria-labelledby="docTitle">
+    <button class="back" data-go="services"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-back"/></svg><span data-i18n="back"></span></button>
+    <div class="page-head reveal">
+      <div>
+        <h1 id="docTitle" data-i18n="doc_title"></h1>
+        <p data-i18n="doc_sub"></p>
+      </div>
+      <span class="mock-tag" data-i18n="mock_label"></span>
+    </div>
+
+    <div class="form-wrap grid-2" style="gap:18px">
+      <form class="card form-card reveal" id="docForm" novalidate>
+        <div class="err-summary" id="docErrSum" role="alert" hidden></div>
+        <div class="field">
+          <label for="docType" data-i18n="doc_type"></label>
+          <select class="select" id="docType" data-err="err_doc_type">
+            <option value="" data-i18n="select_ph"></option>
+            <option value="statement" data-i18n="opt_statement"></option>
+            <option value="income" data-i18n="opt_income"></option>
+            <option value="balance" data-i18n="opt_balance"></option>
+            <option value="tax" data-i18n="opt_tax"></option>
+          </select>
+          <p class="err" id="errDocType"></p>
+        </div>
+
+        <div class="row-2">
+          <div class="field">
+            <label for="docPeriod" data-i18n="doc_period"></label>
+            <select class="select" id="docPeriod">
+              <option value="3" data-i18n="p3"></option>
+              <option value="6" data-i18n="p6"></option>
+              <option value="12" data-i18n="p12"></option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="docCopies" data-i18n="doc_copies"></label>
+            <div class="stepper">
+              <button type="button" id="copiesMinus" data-i18n-aria="aria_less"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+              <input id="docCopies" type="number" inputmode="numeric" min="1" max="5" value="1" aria-describedby="errCopies">
+              <button type="button" id="copiesPlus" data-i18n-aria="aria_more"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+            </div>
+            <p class="err" id="errCopies"></p>
+          </div>
+        </div>
+
+        <fieldset class="field radio-group" style="margin-bottom:16px">
+          <legend data-i18n="doc_delivery"></legend>
+          <label class="radio"><input type="radio" name="delivery" value="email" checked><span data-i18n="del_email"></span></label>
+          <label class="radio"><input type="radio" name="delivery" value="branch"><span data-i18n="del_branch"></span></label>
+        </fieldset>
+
+        <div class="field" id="emailField">
+          <label for="docEmail" data-i18n="doc_email"></label>
+          <input class="input" id="docEmail" type="email" autocomplete="email" data-i18n-ph="doc_email_ph" aria-describedby="errDocEmail">
+          <p class="err" id="errDocEmail"></p>
+        </div>
+
+        <button class="btn primary" type="submit" data-i18n="doc_submit"></button>
+      </form>
+
+      <div class="card form-card reveal" id="docReview" hidden>
+        <h2 tabindex="-1" data-i18n="doc_review_t"></h2>
+        <p class="muted" style="margin-top:6px;font-size:.92rem" data-i18n="doc_review_d"></p>
+        <div class="summary" id="docReviewList"></div>
+        <div class="modal-actions" style="justify-content:flex-start">
+          <button class="btn ghost" type="button" id="docEdit" data-i18n="doc_edit"></button>
+          <button class="btn primary" type="button" id="docConfirm" data-i18n="doc_confirm"></button>
+        </div>
+      </div>
+
+      <aside class="card reveal" style="align-self:start">
+        <h3 data-i18n="doc_info_t"></h3>
+        <p class="muted" style="margin-top:8px;font-size:.92rem" data-i18n="doc_info_d"></p>
+        <ul class="timeline" style="margin-top:18px">
+          <li class="done"><span class="dot"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-check"/></svg></span><div><b data-i18n="status_submitted"></b><small data-i18n="doc_info_s1"></small></div></li>
+          <li><span class="dot"></span><div><b data-i18n="status_processing"></b><small data-i18n="doc_info_s2"></small></div></li>
+          <li><span class="dot"></span><div><b data-i18n="status_ready"></b><small data-i18n="doc_info_s3"></small></div></li>
+        </ul>
+      </aside>
+
+      <div class="card success reveal" id="docSuccess" hidden>
+        <div class="tick"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7"/></svg></div>
+        <h3 data-i18n="success_title"></h3>
+        <p data-i18n="success_doc"></p>
+        <span class="ref" id="docRef"></span>
+        <div class="actions">
+          <button class="btn primary" data-go="svc-tracking" data-i18n="success_track"></button>
+          <button class="btn ghost" id="docAgain" data-i18n="success_again"></button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ---- Appointment ---- -->
+  <section class="view" id="svc-appointment" aria-labelledby="apptTitle">
+    <button class="back" data-go="services"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-back"/></svg><span data-i18n="back"></span></button>
+    <div class="page-head reveal">
+      <div>
+        <h1 id="apptTitle" data-i18n="appt_title"></h1>
+        <p data-i18n="appt_sub"></p>
+      </div>
+      <span class="mock-tag" data-i18n="mock_label"></span>
+    </div>
+
+    <div class="form-wrap grid-2" style="gap:18px">
+      <form class="card form-card reveal" id="apptForm" novalidate>
+        <div class="err-summary" id="apptErrSum" role="alert" hidden></div>
+        <div class="row-2">
+          <div class="field">
+            <label for="apptBranch" data-i18n="appt_branch"></label>
+            <select class="select" id="apptBranch">
+              <option value="" data-i18n="select_ph"></option>
+              <option value="silom" data-i18n="br_silom"></option>
+              <option value="sukhumvit" data-i18n="br_sukhumvit"></option>
+              <option value="siam" data-i18n="br_siam"></option>
+              <option value="chatuchak" data-i18n="br_chatuchak"></option>
+            </select>
+            <p class="err" id="errBranch"></p>
+          </div>
+          <div class="field">
+            <label for="apptPurpose" data-i18n="appt_purpose"></label>
+            <select class="select" id="apptPurpose">
+              <option value="" data-i18n="select_ph"></option>
+              <option value="invest" data-i18n="pu_invest"></option>
+              <option value="account" data-i18n="pu_account"></option>
+              <option value="loan" data-i18n="pu_loan"></option>
+              <option value="general" data-i18n="pu_general"></option>
+            </select>
+            <p class="err" id="errPurpose"></p>
+          </div>
+        </div>
+
+        <div class="field">
+          <span class="label-like" data-i18n="appt_date"></span>
+          <div class="chips-row" id="dateChips" role="radiogroup" data-i18n-aria="appt_date"></div>
+          <p class="err" id="errDate"></p>
+        </div>
+
+        <div class="field">
+          <span class="label-like" data-i18n="appt_time"></span>
+          <div class="chips-row" id="slots" role="radiogroup" data-i18n-aria="appt_time"></div>
+          <p class="err" id="errTime"></p>
+        </div>
+
+        <div class="field">
+          <label for="apptNotes" data-i18n="appt_notes"></label>
+          <textarea class="textarea" id="apptNotes" maxlength="200" rows="3"></textarea>
+          <div class="count-chars" id="notesCount">0/200</div>
+        </div>
+
+        <button class="btn primary" type="submit" data-i18n="appt_submit"></button>
+      </form>
+
+      <aside class="card reveal" style="align-self:start">
+        <h3 data-i18n="appt_summary_t"></h3>
+        <dl class="facts" style="margin-top:8px">
+          <div><dt data-i18n="sum_branch"></dt><dd id="sumBranch"></dd></div>
+          <div><dt data-i18n="sum_purpose"></dt><dd id="sumPurpose"></dd></div>
+          <div><dt data-i18n="sum_when"></dt><dd id="sumWhen"></dd></div>
+        </dl>
+        <h3 style="margin-top:22px" data-i18n="appt_tips_t"></h3>
+        <p class="muted" style="margin-top:8px;font-size:.92rem" data-i18n="appt_tips_d"></p>
+        <div class="proto-note" style="margin-top:16px"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-info"/></svg><span data-i18n="appt_proto"></span></div>
+      </aside>
+
+      <div class="card success reveal" id="apptSuccess" hidden>
+        <div class="tick"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7"/></svg></div>
+        <h3 data-i18n="appt_done_title"></h3>
+        <p id="apptDoneText"></p>
+        <span class="ref" id="apptRef"></span>
+        <div class="actions">
+          <button class="btn primary" data-go="svc-tracking" data-i18n="success_track"></button>
+          <button class="btn ghost" id="apptAgain" data-i18n="success_again"></button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ---- Tracking ---- -->
+  <section class="view" id="svc-tracking" aria-labelledby="trackTitle">
+    <button class="back" data-go="services"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-back"/></svg><span data-i18n="back"></span></button>
+    <div class="page-head reveal">
+      <div>
+        <h1 id="trackTitle" data-i18n="track_title"></h1>
+        <p data-i18n="track_sub"></p>
+      </div>
+      <span class="mock-tag" data-i18n="mock_label"></span>
+    </div>
+    <div class="filter-bar reveal">
+      <div class="seg" role="group" aria-label="Filter">
+        <button data-filter="all" aria-pressed="true" data-i18n="filter_all"></button>
+        <button data-filter="active" aria-pressed="false" data-i18n="filter_active"></button>
+        <button data-filter="done" aria-pressed="false" data-i18n="filter_done"></button>
+      </div>
+      <span class="muted" id="reqCount" style="font-size:.88rem"></span>
+    </div>
+    <ul class="req-list" id="reqList"></ul>
+    <div class="empty" id="reqEmpty" hidden><p data-i18n="track_empty"></p><button class="btn ghost" style="margin-top:14px" data-go="services" data-i18n="track_cta"></button></div>
+  </section>
+
+  <!-- ---- Financial overview ---- -->
+  <section class="view" id="svc-overview" aria-labelledby="ovTitle">
+    <button class="back" data-go="services"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-back"/></svg><span data-i18n="back"></span></button>
+    <div class="page-head reveal">
+      <div>
+        <h1 id="ovTitle" data-i18n="ov_title"></h1>
+        <p data-i18n="ov_sub"></p>
+      </div>
+      <div class="month-nav">
+        <button class="round" id="ovPrev" data-i18n-aria="aria_prev_month"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-back"/></svg></button>
+        <strong id="ovMonth"></strong>
+        <button class="round" id="ovNext" data-i18n-aria="aria_next_month"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-right"/></svg></button>
+      </div>
+    </div>
+    <div class="ov-kpis reveal">
+      <div class="card kpi lift"><span data-i18n="home_income"></span><strong class="count" id="ovIncome">฿0</strong></div>
+      <div class="card kpi lift"><span data-i18n="home_expenses"></span><strong class="count" id="ovExpense">฿0</strong></div>
+      <div class="card kpi lift"><span data-i18n="home_net"></span><strong class="count" id="ovNet">฿0</strong></div>
+      <div class="card kpi lift"><span data-i18n="home_rate"></span><strong class="count" id="ovRate">0%</strong></div>
+    </div>
+    <div class="card reveal" style="padding:26px">
+      <div class="card-head" style="margin-bottom:22px">
+        <div>
+          <h2 data-i18n="ov_breakdown"></h2>
+          <p data-i18n="ov_breakdown_sub"></p>
+        </div>
+        <span class="mock-tag" data-i18n="mock_label"></span>
+      </div>
+      <div class="donut-wrap">
+        <div class="donut" id="donut"></div>
+        <ul class="cat-list" id="catList"></ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= WELLNESS ================= -->
+  <section class="view" id="wellness" aria-labelledby="wlTitle">
+    <div class="page-head reveal">
+      <div>
+        <p class="eyebrow" data-i18n="nav_wellness"></p>
+        <h1 id="wlTitle" data-i18n="wl_title"></h1>
+        <p data-i18n="wl_sub"></p>
+      </div>
+      <span class="mock-tag" data-i18n="mock_label"></span>
+    </div>
+
+    <div class="grid grid-2">
+      <div class="card reveal" aria-labelledby="scoreTitle">
+        <h2 id="scoreTitle" data-i18n="wl_score"></h2>
+        <div class="ring-wrap" style="margin-top:16px">
+          <div class="ring" role="img" aria-labelledby="scoreTitle">
+            <svg viewBox="0 0 164 164" aria-hidden="true">
+              <circle class="track" cx="82" cy="82" r="66"/>
+              <circle class="val" id="ringVal" cx="82" cy="82" r="66" stroke-dasharray="414.7" stroke-dashoffset="414.7"/>
+            </svg>
+            <div class="center">
+              <b class="count" id="cScore" data-count="72" data-kind="int">0</b>
+              <small data-i18n="wl_outof"></small>
+            </div>
+          </div>
+          <div class="score-text">
+            <h3 data-i18n="wl_level"></h3>
+            <p class="muted" style="font-size:.9rem;margin-top:6px" data-i18n="wl_level_d"></p>
+            <span class="pill green" data-i18n="wl_level_tag"></span>
+          </div>
+        </div>
+        <details class="how">
+          <summary data-i18n="wl_how_t"></summary>
+          <p class="muted small" data-i18n="wl_how_d"></p>
+          <table class="factor-table">
+            <thead><tr><th data-i18n="wl_factor"></th><th data-i18n="wl_yours"></th><th data-i18n="wl_weight"></th><th data-i18n="wl_contrib"></th></tr></thead>
+            <tbody id="factorBody"></tbody>
+          </table>
+        </details>
+        <h3 style="margin-top:24px" data-i18n="wl_insights"></h3>
+        <div class="insights" id="insights"></div>
+      </div>
+
+      <div class="grid" style="gap:18px">
+        <div class="card reveal">
+          <div class="card-head" style="margin-bottom:12px">
+            <div><h2 data-i18n="wl_spend"></h2><p data-i18n="wl_spend_sub"></p></div>
+          </div>
+          <div class="spend" id="spend"></div>
+        </div>
+
+        <div class="card reveal progress-card">
+          <div class="card-head" style="margin-bottom:6px">
+            <h2 data-i18n="wl_recs"></h2>
+            <span class="pill" id="recPill"></span>
+          </div>
+          <div class="bar green"><i id="recBar"></i></div>
+          <p class="muted" style="font-size:.85rem;margin-top:6px" data-i18n="wl_progress"></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="recs section-block" id="recs"></div>
+    <p class="micro" style="text-align:center;margin-top:24px" data-i18n="wl_note"></p>
+  </section>
+
+  <!-- ================= FINANCIAL GOALS ================= -->
+  <section class="view" id="goals" aria-labelledby="goalsTitle">
+    <div class="page-head reveal">
+      <div>
+        <h1 id="goalsTitle" data-i18n="goals_title"></h1>
+        <p data-i18n="goals_sub"></p>
+      </div>
+      <div class="head-actions">
+        <span class="mock-tag" data-i18n="mock_label"></span>
+        <button class="btn primary" type="button" id="goalNew" data-i18n="goals_new"></button>
+      </div>
+    </div>
+
+    <div class="kpis goal-kpis reveal">
+      <div class="card kpi"><span data-i18n="goals_total"></span><strong class="count" id="gkCount">0</strong></div>
+      <div class="card kpi"><span data-i18n="goals_saved"></span><strong class="count" id="gkSaved" data-kind="baht">฿0</strong></div>
+      <div class="card kpi"><span data-i18n="goals_done"></span><strong class="count" id="gkDone">0</strong></div>
+    </div>
+
+    <div class="goal-grid" id="goalList"></div>
+
+    <div class="empty" id="goalEmpty" hidden>
+      <p data-i18n="goals_empty"></p>
+      <button class="btn ghost" type="button" id="goalNew2" style="margin-top:14px" data-i18n="goals_new"></button>
+    </div>
+    <p class="micro" style="margin-top:20px" data-i18n="goals_note"></p>
+  </section>
+
+  <!-- ================= PLAYGROUND (coming soon) ================= -->
+  <section class="view" id="playground" aria-labelledby="pgTitle">
+    <div class="page-head reveal">
+      <div>
+        <p class="eyebrow" data-i18n="pg_eyebrow"></p>
+        <h1 id="pgTitle" data-i18n="pg_title"></h1>
+      </div>
+    </div>
+    <div class="soon reveal">
+      <svg class="rings" viewBox="0 0 320 320" aria-hidden="true">
+        <circle cx="160" cy="160" r="60"/><circle cx="160" cy="160" r="110"/><circle cx="160" cy="160" r="158"/>
+      </svg>
+      <div class="content">
+        <div class="mark"><svg viewBox="0 0 64 64" aria-hidden="true"><use href="#bm-dark"/></svg></div>
+        <span class="pill blue" data-i18n="pg_soon"></span>
+        <h2 style="margin-top:14px;font-size:1.4rem" data-i18n="pg_heading"></h2>
+        <p data-i18n="pg_desc"></p>
+        <button class="btn ghost" data-go="home" data-i18n="pg_back"></button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= CONTACT ================= -->
+  <section class="view" id="contact" aria-labelledby="ctTitle">
+    <div class="page-head reveal">
+      <div>
+        <p class="eyebrow" data-i18n="nav_contact"></p>
+        <h1 id="ctTitle" data-i18n="ct_title"></h1>
+        <p data-i18n="ct_sub"></p>
+      </div>
+    </div>
+
+    <div class="contact-grid">
+      <div class="grid" style="gap:18px">
+        <div class="card profile reveal">
+          <div class="profile-top">
+            <div class="avatar" aria-hidden="true">AO</div>
+            <div>
+              <h2 data-i18n-txt="ct_name"></h2>
+              <p data-i18n="ct_role"></p>
+            </div>
+          </div>
+          <dl class="facts">
+            <div><dt data-i18n="ct_f_role"></dt><dd data-i18n="ct_role"></dd></div>
+            <div><dt data-i18n="ct_f_org"></dt><dd>Bangkok Bank</dd></div>
+            <div><dt data-i18n="ct_f_project"></dt><dd>BBL HI PRO</dd></div>
+          </dl>
+        </div>
+        <div class="card intro reveal">
+          <h3 data-i18n="ct_intro_t"></h3>
+          <p data-i18n="ct_intro_d"></p>
+        </div>
+      </div>
+
+      <div>
+        <form class="card form-card reveal" id="contactForm" novalidate>
+          <div class="row-2">
+            <div class="field">
+              <label for="cName" data-i18n="f_name"></label>
+              <input class="input" id="cName" type="text" autocomplete="name" aria-describedby="errName">
+              <p class="err" id="errName"></p>
+            </div>
+            <div class="field">
+              <label for="cEmail" data-i18n="f_email"></label>
+              <input class="input" id="cEmail" type="email" autocomplete="email" data-i18n-ph="f_email_ph" aria-describedby="errEmail">
+              <p class="err" id="errEmail"></p>
+            </div>
+          </div>
+          <div class="field">
+            <label for="cSubject" data-i18n="f_subject"></label>
+            <select class="select" id="cSubject" aria-describedby="errSubject">
+              <option value="" data-i18n="select_ph"></option>
+              <option value="general" data-i18n="s_general"></option>
+              <option value="ux" data-i18n="s_ux"></option>
+              <option value="issue" data-i18n="s_issue"></option>
+              <option value="partner" data-i18n="s_partner"></option>
+            </select>
+            <p class="err" id="errSubject"></p>
+          </div>
+          <div class="field">
+            <label for="cMessage" data-i18n="f_message"></label>
+            <textarea class="textarea" id="cMessage" maxlength="500" rows="5" aria-describedby="errMessage"></textarea>
+            <p class="err" id="errMessage"></p>
+          </div>
+          <div class="count-chars" id="msgCount">0/500</div>
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap">
+            <div class="proto-note" style="margin:0"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-info"/></svg><span data-i18n="ct_proto"></span></div>
+            <button class="btn primary" type="submit" id="ctSubmit" data-i18n="ct_send"></button>
+          </div>
+        </form>
+
+        <div class="card success reveal" id="contactSuccess" hidden>
+          <div class="tick"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7"/></svg></div>
+          <h3 data-i18n="ct_success_t"></h3>
+          <p data-i18n="ct_success_d"></p>
+          <div class="actions">
+            <button class="btn ghost" id="ctAgain" data-i18n="ct_again"></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= BRAND OPTIONS ================= -->
+  <section class="view" id="brand" aria-labelledby="brTitle">
+    <div class="page-head reveal">
+      <div>
+        <p class="eyebrow" data-i18n="footer_brand"></p>
+        <h1 id="brTitle" data-i18n="br_title"></h1>
+        <p data-i18n="br_sub"></p>
+      </div>
+      <span class="mock-tag" data-i18n="br_status"></span>
+    </div>
+
+    <div class="brand-grid">
+      <article class="card reveal brand-intro">
+        <svg class="bm-xl" viewBox="0 0 64 64" aria-hidden="true"><use href="#bm-light"/></svg>
+        <div>
+          <h2 data-i18n="br_concept_b"></h2>
+          <p class="muted" data-i18n="br_concept_d"></p>
+        </div>
+      </article>
+
+      <article class="card reveal">
+        <h3 data-i18n="br_light_t"></h3>
+        <div class="variant light"><svg class="bm-xl" viewBox="0 0 64 64" aria-hidden="true"><use href="#bm-light"/></svg></div>
+      </article>
+
+      <article class="card reveal">
+        <h3 data-i18n="br_dark_t"></h3>
+        <div class="variant dark"><svg class="bm-xl" viewBox="0 0 64 64" aria-hidden="true"><use href="#bm-dark"/></svg></div>
+      </article>
+
+      <article class="card reveal">
+        <h3 data-i18n="br_sizes_t"></h3>
+        <div class="sizes">
+          <figure><svg width="64" height="64" viewBox="0 0 64 64" aria-hidden="true"><use href="#bm-light"/></svg><figcaption>64</figcaption></figure>
+          <figure><svg width="32" height="32" viewBox="0 0 64 64" aria-hidden="true"><use href="#bm-light"/></svg><figcaption>32</figcaption></figure>
+          <figure><svg width="20" height="20" viewBox="0 0 64 64" aria-hidden="true"><use href="#bm-light"/></svg><figcaption>20</figcaption></figure>
+          <figure><svg width="16" height="16" viewBox="0 0 64 64" aria-hidden="true"><use href="#bm-light"/></svg><figcaption>16</figcaption></figure>
+        </div>
+        <h3 style="margin-top:22px" data-i18n="br_fav_t"></h3>
+        <p class="muted small" data-i18n="br_fav_d"></p>
+        <div class="tabmock" aria-hidden="true">
+          <span class="tab"><svg width="16" height="16" viewBox="0 0 64 64"><use href="#bm-light"/></svg><span data-i18n="brand_sub"></span></span>
+        </div>
+      </article>
+
+      <article class="card reveal">
+        <h3 data-i18n="br_rules_t"></h3>
+        <ul class="rules">
+          <li data-i18n="br_rule1"></li>
+          <li data-i18n="br_rule2"></li>
+          <li data-i18n="br_rule3"></li>
+        </ul>
+      </article>
+    </div>
+    <p class="micro" style="margin-top:20px" data-i18n="br_foot"></p>
+  </section>
+
+  <footer class="site-foot">
+    <span class="foot-brand"><svg class="bm-s" viewBox="0 0 64 64" aria-hidden="true"><use href="#bm-light"/></svg><b>BBL HI PRO</b></span>
+    <span data-i18n="footer_mock"></span>
+    <nav aria-label="Footer">
+      <a href="#brand" data-i18n="footer_brand"></a>
+      <a href="#contact" data-i18n="nav_contact"></a>
+    </nav>
+  </footer>
+</main>
+
+<!-- Mobile bottom navigation -->
+<nav class="bottom-nav" aria-label="Mobile">
+  <a href="#home" data-nav="home"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-home"/></svg><span data-i18n="nav_home_s"></span></a>
+  <a href="#services" data-nav="services"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-grid"/></svg><span data-i18n="nav_services"></span></a>
+  <a href="#goals" data-nav="goals"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-chart"/></svg><span data-i18n="nav_goals_s"></span></a>
+  <a href="#wellness" data-nav="wellness"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-heart"/></svg><span data-i18n="nav_wellness_s"></span></a>
+  <a href="#playground" data-nav="playground"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-layers"/></svg><span data-i18n="nav_playground_s"></span></a>
+</nav>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(() => {
+  'use strict';
+
+  /* =========================================================
+     1. Localization dictionary  [Thai, English]
+     ========================================================= */
+  const S = {
+    brand_sub:['แอปพลิเคชันธนาคาร · Web Preview','Web Experience · Prototype'],
+    nav_home:['หน้าหลัก','Home'], nav_home_s:['หน้าหลัก','Home'],
+    skip:['ข้ามไปยังเนื้อหาหลัก','Skip to main content'], soon:['เร็ว ๆ นี้','Soon'],
+    resume_t:['ต่อจากที่ค้างไว้','Continue where you left off'], resume_none:['ไม่มีงานค้าง','Nothing pending'],
+    resume_none_d:['คำขอทั้งหมดของคุณเสร็จสิ้นแล้ว','All your requests are complete.'],
+    resume_cta:['ดูรายละเอียด','View details'], resume_new:['ขอเอกสารใหม่','Request a document'],
+    doc_review_t:['ตรวจสอบคำขอ','Review your request'], doc_review_d:['กรุณาตรวจสอบข้อมูลก่อนส่งคำขอ','Please check the details before you submit.'],
+    doc_edit:['แก้ไข','Edit'], doc_confirm:['ยืนยันส่งคำขอ','Confirm and submit'],
+    processing:['กำลังดำเนินการ…','Processing…'], err_summary:['กรุณาแก้ไขข้อผิดพลาดต่อไปนี้','Please fix the following'],
+    not_selected:['ยังไม่ได้เลือก','Not selected'], appt_summary_t:['สรุปการจอง','Booking summary'],
+    wl_how_t:['วิธีคำนวณคะแนน','How the score is calculated'],
+    wl_how_d:['คะแนนรวมคำนวณจากน้ำหนักของแต่ละปัจจัย (ข้อมูลจำลอง)','The total is the weighted sum of each factor (mock data).'],
+    wl_factor:['ปัจจัย','Factor'], wl_yours:['คะแนน','Score'], wl_weight:['น้ำหนัก','Weight'], wl_contrib:['ได้คะแนน','Points'], wl_total:['รวม','Total'],
+    f_savings:['การออมสม่ำเสมอ','Consistent saving'], f_bills:['ชำระบิลตรงเวลา','On-time bill payments'],
+    f_budget:['ใช้จ่ายตามงบ','Staying within budget'], f_fund:['เงินสำรองฉุกเฉิน','Emergency fund'],
+    ins_act_overview:['ดูรายรับรายจ่าย','View income & expenses'], ins_act_shop:['ดูหมวดช้อปปิ้ง','View shopping spend'],
+    ins_act_goal:['ไปที่เป้าหมายเงินสำรอง','Go to emergency fund goal'],
+    rec_act_overview:['ไปที่ภาพรวมการเงิน','Go to financial overview'], rec_act_goal:['ไปที่เป้าหมาย','Go to goal'],
+    track_cta:['ดูบริการทั้งหมด','Browse services'],
+    nav_goals:['เป้าหมายการเงิน','Financial Goals'], nav_goals_s:['เป้าหมาย','Goals'],
+    goals_title:['เป้าหมายการเงิน','Financial Goals'],
+    goals_sub:['ตั้งเป้าหมาย ติดตามความคืบหน้า และออมจำลองเพื่อดูการเปลี่ยนแปลง','Set goals, track progress and try simulated savings.'],
+    goals_new:['สร้างเป้าหมาย','New goal'], goals_all:['ดูเป้าหมายทั้งหมด','View all goals'],
+    goals_total:['เป้าหมายทั้งหมด','Total goals'], goals_saved:['ยอดออมรวม','Total saved'], goals_done:['สำเร็จแล้ว','Completed'],
+    goals_empty:['ยังไม่มีเป้าหมาย เริ่มตั้งเป้าหมายแรกของคุณได้เลย','No goals yet. Set your first goal to get started.'],
+    goals_note:['ยอดเงิน วันที่ และสถานะทั้งหมดเป็นข้อมูลจำลอง ไม่มีการโอนเงินจริง','All amounts, dates and statuses are mock data. No real money moves.'],
+    goal_deadline:['ภายใน {date}','By {date}'], goal_pct:['{p}% ของเป้าหมาย','{p}% of goal'],
+    goal_left:['เหลืออีก {amt}','{amt} to go'], goal_suggest:['แนะนำออมเดือนละประมาณ {amt}','Suggested: about {amt} per month'],
+    goal_suggest_done:['ถึงเป้าหมายแล้ว','Goal reached'], goal_sim:['ออมจำลอง','Save (simulated)'],
+    goal_sim_amt:['จำนวนเงินจำลอง','Simulated amount'], goal_edit:['แก้ไข','Edit'],
+    st_done:['สำเร็จแล้ว','Completed'], st_ontrack:['ตามแผน','On track'], st_behind:['ตามหลังแผน','Behind plan'], st_overdue:['เลยกำหนด','Past due'],
+    gf_title_new:['สร้างเป้าหมายใหม่','Create a goal'], gf_title_edit:['แก้ไขเป้าหมาย','Edit goal'],
+    gf_name:['ชื่อเป้าหมาย','Goal name'], gf_name_ph:['เช่น ค่าเทอมลูก','e.g. School fees'],
+    gf_target:['ยอดเป้าหมาย (฿)','Target amount (฿)'], gf_date:['วันที่ต้องการให้ถึงเป้า','Target date'],
+    gf_saved:['ยอดที่มีแล้ว (฿)','Amount saved so far (฿)'], gf_save:['บันทึก','Save'],
+    err_gname:['กรุณากรอกชื่อ 2–40 ตัวอักษร','Enter a name of 2–40 characters'],
+    err_gtarget:['ยอดเป้าหมายต้องอยู่ระหว่าง ฿1,000 ถึง ฿10,000,000','Target must be between ฿1,000 and ฿10,000,000'],
+    err_gdate:['วันที่ต้องอยู่ในอนาคตและไม่เกิน 10 ปี','Date must be in the future and within 10 years'],
+    err_gsaved:['ยอดที่มีแล้วต้องไม่เกินยอดเป้าหมาย','Saved amount cannot be more than the target'],
+    toast_goal_add:['ออมจำลอง {amt} แล้ว','Saved {amt} (simulated)'],
+    toast_goal_done:['ถึงเป้าหมาย "{name}" แล้ว (จำลอง)','Goal "{name}" reached (simulated)'],
+    toast_goal_saved:['บันทึกเป้าหมายแล้ว','Goal saved'],
+    g_japan:['ทริปญี่ปุ่น','Japan trip'], g_fund:['เงินสำรองฉุกเฉิน','Emergency fund'], g_laptop:['โน้ตบุ๊กเครื่องใหม่','New laptop'],
+    nav_services:['บริการ','Services'],
+    nav_wellness:['Financial Wellness','Financial Wellness'], nav_wellness_s:['Wellness','Wellness'],
+    nav_playground:['Financial Playground','Financial Playground'], nav_playground_s:['Playground','Playground'],
+    pg_eyebrow:['BBL HI PRO · ส่วนหนึ่งของโครงการ','BBL HI PRO · Part of the project'],
+    nav_contact:['ติดต่อเรา','Contact Us'],
+    aria_lang:['เลือกภาษา','Language'], aria_less:['ลดจำนวน','Decrease'], aria_more:['เพิ่มจำนวน','Increase'],
+    aria_prev_month:['เดือนก่อนหน้า','Previous month'], aria_next_month:['เดือนถัดไป','Next month'],
+    mock_label:['ข้อมูลจำลอง','Mock data'], footer_mock:['ข้อมูลทั้งหมดในหน้านี้เป็นข้อมูลจำลองสำหรับ prototype','All data on this page is mock data for prototyping'],
+    footer_brand:['ตัวตนแบรนด์','Brand identity'],
+    open:['เปิดบริการ','Open'], back:['กลับไปหน้าบริการ','Back to services'],
+    select_ph:['กรุณาเลือก','Please select'],
+    close:['ปิด','Close'], cancel:['ยกเลิก','Cancel'], confirm:['ยืนยัน','Confirm'],
+
+    /* Greetings & home */
+    splash_msg:['กำลังเตรียมข้อมูลจำลอง…','Preparing mock data…'],
+    home_intro:['BBL HI PRO เป็นบริการเสริมบนแอปพลิเคชัน Bangkok Bank Mobile Banking ช่วยให้เข้าถึงบริการต่าง ๆ ได้สะดวกขึ้น ธุรกรรมหลักยังทำผ่านแอปพลิเคชันตามปกติ','BBL HI PRO is a web companion to Bangkok Bank Mobile Banking that makes surrounding services easier to reach. Core banking stays in the app.'],
+    greet_morning:['อรุณสวัสดิ์','Good morning'], greet_afternoon:['สวัสดียามบ่าย','Good afternoon'], greet_evening:['สวัสดียามเย็น','Good evening'],
+    hello_name:['สวัสดี, คุณสมชาย','Hello, Somchai'],
+    home_sub:['ภาพรวมการเงินของคุณ เดือนพฤศจิกายน 2569','Your financial overview for November 2026'],
+    home_balance:['ยอดเงินคงเหลือรวม','Total balance'], home_balance_note:['บัญชีออมทรัพย์และบัญชีกระแสรายวัน','Savings and current accounts'],
+    home_income:['รายรับ · พ.ย.','Income · Nov'], home_income_note:['เงินเดือนและเงินโอนเข้า','Salary and transfers in'],
+    home_expenses:['รายจ่าย · พ.ย.','Expenses · Nov'], home_expense_note:['คิดเป็น 64% ของรายรับ','64% of income'],
+    home_net:['เงินเหลือสุทธิ','Net cash flow'], home_net_note:['รายรับ − รายจ่าย','Income minus expenses'],
+    home_rate:['อัตราการออม','Savings rate'], home_rate_note:['ของรายรับเดือนนี้','Of this month\'s income'],
+    home_cashflow:['กระแสเงินสด','Cash flow'], home_cashflow_sub:['รายรับและรายจ่ายย้อนหลัง','Income and expenses over time'],
+    period_6m:['6 เดือน','6 months'], period_12m:['12 เดือน','12 months'],
+    legend_income:['รายรับ','Income'], legend_expenses:['รายจ่าย','Expenses'],
+    home_goal_title:['เป้าหมาย: ทริปญี่ปุ่น','Goal: Japan Trip'], home_goal_tag:['เป้าหมาย','Goal'],
+    goal_remain:['เหลืออีก {amt} เพื่อถึงเป้าหมาย','{amt} left to reach your goal'],
+    goal_done:['ถึงเป้าหมายแล้ว','Goal reached'],
+    goal_add:['ออมเพิ่ม ฿500','Save ฿500'],
+    sim_note:['🧪 การกระทำนี้เป็นการจำลอง ไม่มีการโอนเงินจริง','🧪 Simulated action. No real money is moved.'],
+    home_quick:['บริการด่วน','Quick access'],
+    quick_docs:['ขอเอกสาร','Request documents'], quick_appt:['จองนัดหมาย','Book appointment'],
+    quick_track:['ติดตามคำขอ','Track requests'], quick_wellness:['Financial Wellness','Financial Wellness'],
+    home_activity:['รายการล่าสุด','Recent activity'],
+    act_salary:['เงินเดือนเข้าบัญชี','Salary credited'], act_bill:['ชำระค่าสาธารณูปโภค','Utility bill paid'],
+    act_save:['โอนเข้าบัญชีออมทรัพย์','Transfer to savings'], act_card:['ชำระบัตรเครดิต','Credit card payment'],
+
+    /* Notifications */
+    notif_title:['การแจ้งเตือน','Notifications'], notif_markall:['อ่านทั้งหมด','Mark all as read'],
+    n1_t:['คำขอเอกสารของคุณเสร็จแล้ว','Your document request is ready'], n1_b:['Statement 6 เดือน พร้อมดาวน์โหลด','6-month statement is ready to download'],
+    n2_t:['เตือนนัดหมาย','Appointment reminder'], n2_b:['นัดหมายสาขาสีลม วันพฤหัสบดีที่ 12 พ.ย. 10:30 น.','Silom branch on Thu 12 Nov at 10:30'],
+    n3_t:['ยอดเงินเข้าบัญชี','Funds received'], n3_b:['มีเงินเข้าบัญชี ฿45,000 จากเงินเดือน','฿45,000 salary credited to your account'],
+
+    /* Services */
+    svc_title:['บริการทางการเงิน','Financial services'],
+    svc_sub:['ทำรายการและติดตามคำขอได้ในที่เดียว','Handle requests and track progress in one place'],
+    svc_docs_t:['ขอเอกสาร','Document requests'], svc_docs_d:['ขอ statement หรือหนังสือรับรองแบบออนไลน์','Request statements and certificates online'],
+    svc_appt_t:['จองนัดหมายสาขา','Branch appointments'], svc_appt_d:['เลือกสาขา วันที่ และเวลาที่สะดวก','Choose a branch, date and time that suits you'],
+    svc_track_t:['ติดตามคำขอ','Request tracking'], svc_track_d:['ดูสถานะและความคืบหน้าของทุกคำขอ','See status and progress for every request'],
+    svc_overview_t:['ภาพรวมการเงิน','Financial overview'], svc_overview_d:['ดูรายรับ รายจ่าย และหมวดการใช้จ่ายรายเดือน','Monthly income, expenses and spending categories'],
+    svc_wellness_t:['Financial Wellness','Financial Wellness'], svc_wellness_d:['คะแนนและคำแนะนำเพื่อพฤติกรรมการเงินที่ดี','Score and tips for healthier money habits'],
+
+    /* Document request */
+    doc_title:['ขอเอกสาร','Request documents'],
+    doc_sub:['เลือกประเภทเอกสารและรูปแบบการรับ ระบบจะสร้างหมายเลขอ้างอิงให้ทันที','Choose a document and how to receive it. You will get a reference number right away.'],
+    doc_type:['ประเภทเอกสาร','Document type'],
+    opt_statement:['Statement รายการเดินบัญชี','Account statement'], opt_income:['หนังสือรับรองรายได้','Income certificate'],
+    opt_balance:['หนังสือรับรองยอดเงินในบัญชี','Account balance certificate'], opt_tax:['หนังสือรับรองการหักภาษี ณ ที่จ่าย','Withholding tax certificate'],
+    doc_period:['ช่วงเวลา','Period'], p3:['3 เดือนล่าสุด','Last 3 months'], p6:['6 เดือนล่าสุด','Last 6 months'], p12:['12 เดือนล่าสุด','Last 12 months'],
+    doc_copies:['จำนวนฉบับ','Copies'], doc_delivery:['วิธีรับเอกสาร','How to receive'],
+    del_email:['ส่งทางอีเมล','Send by email'], del_branch:['รับที่สาขา','Pick up at a branch'],
+    doc_email:['อีเมลสำหรับรับเอกสาร','Email for delivery'], doc_email_ph:['name@example.com','name@example.com'],
+    doc_submit:['ส่งคำขอ','Submit request'],
+    doc_info_t:['ขั้นตอนการดำเนินการ','What happens next'], doc_info_d:['คำขอจะผ่านขั้นตอนต่อไปนี้ โดยทั่วไปใช้เวลา 1–2 วันทำการ','Your request moves through these steps, usually within 1–2 business days.'],
+    doc_info_s1:['รับคำขอเข้าระบบแล้ว','Request received'], doc_info_s2:['ตรวจสอบและจัดเตรียมเอกสาร','Verifying and preparing'], doc_info_s3:['พร้อมดาวน์โหลดหรือรับที่สาขา','Ready to download or pick up'],
+    err_doc_type:['กรุณาเลือกประเภทเอกสาร','Please select a document type'],
+    err_copies:['จำนวนฉบับต้องอยู่ระหว่าง 1 ถึง 5','Copies must be between 1 and 5'],
+    err_email:['กรุณากรอกอีเมลให้ถูกต้อง เช่น name@example.com','Please enter a valid email, e.g. name@example.com'],
+    success_title:['ส่งคำขอเรียบร้อยแล้ว','Request submitted'],
+    success_doc:['คำขอของคุณถูกบันทึกในระบบ (จำลอง) และจะปรากฏในหน้าติดตามคำขอ','Your request has been recorded (simulated) and now appears in request tracking.'],
+    success_track:['ดูสถานะคำขอ','View request status'], success_again:['ทำรายการใหม่','Start a new one'],
+    ref_label:['หมายเลขอ้างอิง','Reference'],
+
+    /* Appointment */
+    appt_title:['จองนัดหมายสาขา','Book a branch appointment'],
+    appt_sub:['เลือกสาขา วัตถุประสงค์ วันและเวลาที่ต้องการ','Select a branch, purpose, date and time'],
+    appt_branch:['สาขา','Branch'], appt_purpose:['วัตถุประสงค์','Purpose'],
+    br_silom:['สำนักงานใหญ่ สีลม','Head Office, Silom'], br_sukhumvit:['สาขาสุขุมวิท','Sukhumvit branch'],
+    br_siam:['สาขาสยาม','Siam branch'], br_chatuchak:['สาขาจตุจักร','Chatuchak branch'],
+    pu_invest:['ปรึกษาการลงทุน','Investment advice'], pu_account:['เปิดบัญชีหรือยืนยันตัวตน','Account opening or verification'],
+    pu_loan:['ปรึกษาสินเชื่อบ้าน','Home loan consultation'], pu_general:['สอบถามทั่วไป','General enquiry'],
+    appt_date:['เลือกวันที่','Choose a date'], appt_time:['เลือกเวลา','Choose a time'],
+    slot_full:['เต็ม','Full'],
+    appt_notes:['หมายเหตุ (ไม่บังคับ)','Notes (optional)'], appt_submit:['ยืนยันการจอง','Continue to confirm'],
+    appt_tips_t:['ก่อนเข้าพบ','Before your visit'], appt_tips_d:['กรุณานำบัตรประชาชนหรือพาสปอร์ตมาด้วย และมาก่อนเวลานัดประมาณ 10 นาที','Bring your national ID or passport and arrive about 10 minutes early.'],
+    appt_proto:['Prototype: การจองนี้ไม่ได้บันทึกกับธนาคารจริง','Prototype: this booking is not saved with the bank.'],
+    appt_done_title:['จองนัดหมายสำเร็จ','Appointment booked'],
+    appt_done_text:['{branch} · {date} เวลา {time} น.','{branch} · {date} at {time}'],
+    err_branch:['กรุณาเลือกสาขา','Please select a branch'], err_purpose:['กรุณาเลือกวัตถุประสงค์','Please select a purpose'],
+    err_date:['กรุณาเลือกวันที่','Please choose a date'], err_time:['กรุณาเลือกเวลา','Please choose a time'],
+    appt_confirm_t:['ยืนยันการจองนัดหมาย?','Confirm your appointment?'],
+    sum_branch:['สาขา','Branch'], sum_purpose:['วัตถุประสงค์','Purpose'], sum_when:['วันและเวลา','Date and time'],
+
+    /* Tracking */
+    track_title:['ติดตามคำขอ','Request tracking'], track_sub:['สถานะของคำขอและการนัดหมายทั้งหมดของคุณ','Status of all your requests and appointments'],
+    filter_all:['ทั้งหมด','All'], filter_active:['กำลังดำเนินการ','In progress'], filter_done:['เสร็จสิ้น','Completed'],
+    track_empty:['ไม่มีรายการในหมวดนี้','Nothing in this category'],
+    req_count:['{n} รายการ','{n} items'],
+    type_doc:['เอกสาร','Document'], type_appt:['นัดหมาย','Appointment'],
+    status_submitted:['รับคำขอแล้ว','Submitted'], status_processing:['กำลังดำเนินการ','Processing'], status_ready:['พร้อมแล้ว','Ready'],
+    status_booked:['จองแล้ว','Booked'], status_confirmed:['ยืนยันแล้ว','Confirmed'], status_completed:['เสร็จสิ้น','Completed'],
+    track_detail:['รายละเอียดคำขอ','Request details'], track_next:['จำลองขั้นตอนถัดไป','Simulate next step'],
+    track_done_msg:['คำขอนี้เสร็จสิ้นแล้ว','This request is complete'],
+    track_next_msg:['อัปเดตสถานะเป็น "{status}" แล้ว (จำลอง)','Status updated to "{status}" (simulated)'],
+    req_ref:['อ้างอิง','Ref'], req_date_lbl:['วันที่','Date'], req_branch:['สาขา','Branch'],
+
+    /* Overview */
+    ov_title:['ภาพรวมการเงิน','Financial overview'], ov_sub:['สรุปรายรับ รายจ่าย และหมวดการใช้จ่ายรายเดือน','Monthly summary of income, expenses and spending categories'],
+    ov_breakdown:['การใช้จ่ายตามหมวด','Spending by category'], ov_breakdown_sub:['แตะหมวดเพื่อดูรายละเอียดในกราฟ','Tap a category to highlight it in the chart'],
+    ov_total:['รวม','Total'],
+    cat_food:['อาหารและเครื่องดื่ม','Food & drinks'], cat_transport:['เดินทาง','Transport'], cat_bills:['ค่าสาธารณูปโภค','Bills & utilities'],
+    cat_shop:['ช้อปปิ้ง','Shopping'], cat_fun:['บันเทิงและไลฟ์สไตล์','Entertainment & lifestyle'],
+
+    /* Wellness */
+    wl_title:['Financial Wellness','Financial Wellness'],
+    wl_sub:['ภาพรวมพฤติกรรมการเงินของคุณ อ่านง่ายและเข้าใจได้ทันที','A clear, calm view of your money habits'],
+    wl_score:['คะแนนสุขภาพการเงิน','Financial wellness score'], wl_outof:['จาก 100','out of 100'],
+    wl_level:['อยู่ในเกณฑ์ดี','Healthy and improving'],
+    wl_level_d:['คุณออมได้สม่ำเสมอ แต่ค่าช้อปปิ้งยังสูงกว่างบบางเดือน','You save consistently, though shopping sometimes exceeds budget.'],
+    wl_level_tag:['ดีขึ้นจากเดือนก่อน +4','Up 4 points from last month'],
+    wl_insights:['ข้อมูลเชิงลึก','Insights'],
+    ins1_t:['ออมได้สม่ำเสมอ','Consistent savings'], ins1_d:['คุณมีเงินเหลือทุกเดือนในช่วง 6 เดือนที่ผ่านมา เป็นสัญญาณที่ดี','You had money left over every month in the last six months, a strong signal.'],
+    ins2_t:['ค่าช้อปปิ้งเกินงบ','Shopping is over budget'], ins2_d:['เดือนนี้ใช้จ่ายเกินงบประมาณ ฿1,980 ลองตั้งงบรายสัปดาห์ดูไหม','You spent ฿1,980 above budget this month. Consider a weekly limit.'],
+    ins3_t:['กองทุนฉุกเฉินยังไม่ถึงเป้า','Emergency fund is still building'], ins3_d:['เงินสำรองปัจจุบันประมาณ 1.5 เดือนของค่าใช้จ่าย เป้าหมายคือ 3 เดือน','Current reserves cover about 1.5 months of expenses. The goal is 3 months.'],
+    wl_spend:['การใช้จ่ายเดือนนี้เทียบกับงบ','This month: spending vs budget'], wl_spend_sub:['แตะแถวเพื่อดูรายละเอียด','Tap a row for details'],
+    wl_spent:['ใช้ไป','Spent'], wl_budget:['งบ','Budget'],
+    spend_under:['เหลือ {amt}','{amt} left'], spend_over:['เกินงบ {amt}','{amt} over budget'],
+    wl_recs:['คำแนะนำ','Recommendations'],
+    wl_progress:['ทำไปแล้วเพื่อเพิ่มคะแนน','Completed toward your score'],
+    rec_count:['{n} จาก {total} ข้อ','{n} of {total}'],
+    rec1_t:['ตั้งเป้าออม 10% ของรายได้','Save 10% of your income'], rec1_d:['ตั้งโอนอัตโนมัติวันที่ได้รับเงินเดือน เพื่อให้ออมโดยไม่ต้องคิด','Set an automatic transfer on payday so saving happens without effort.'],
+    rec2_t:['ทบทวนค่าสมาชิกรายเดือน','Review monthly subscriptions'], rec2_d:['ตรวจบริการที่ไม่ได้ใช้แล้วยกเลิกได้ทันที ช่วยลดรายจ่ายประจำ','Cancel services you no longer use to lower fixed costs.'],
+    rec3_t:['สร้างเงินสำรองฉุกเฉิน','Build an emergency fund'], rec3_d:['เพิ่มเงินสำรองให้ได้ 3 เดือนของค่าใช้จ่ายจำเป็น','Grow reserves to cover three months of essential expenses.'],
+    rec_mark:['ทำแล้ว','Mark as done'], rec_undo:['ยกเลิกการทำเครื่องหมาย','Undo'], rec_done:['ทำแล้ว ✓','Done ✓'],
+    wl_note:['คะแนน ค่าใช้จ่าย และคำแนะนำทั้งหมดเป็นข้อมูลจำลองสำหรับ prototype ไม่ใช่คำแนะนำทางการเงิน','All scores, spending and tips are mock data for this prototype and are not financial advice.'],
+
+    /* Playground placeholder */
+    pg_title:['Financial Playground','Financial Playground'],
+    pg_soon:['เร็ว ๆ นี้','Coming soon'],
+    pg_heading:['พื้นที่เรียนรู้การเงินแบบเล่นได้','A playful space for learning money'],
+    pg_desc:['กำลังอยู่ระหว่างการออกแบบ ขอบคุณที่รอค่ะ','Currently in design. Thank you for your patience.'],
+    pg_back:['กลับหน้าหลัก','Back to home'],
+
+    /* Contact */
+    ct_title:['ติดต่อเรา','Contact us'],
+    ct_sub:['ส่งข้อความถึงทีมโครงการ (ตัวอย่าง)','Send a message to the project team (prototype)'],
+    ct_name:['Apirak Oulis','Apirak Oulis'],
+    ct_role:['Programmer / Mobile Banking','Programmer / Mobile Banking'],
+    ct_f_role:['ตำแหน่ง','Role'], ct_f_org:['หน่วยงาน','Organization'], ct_f_project:['โครงการ','Project'],
+    ct_intro_t:['เกี่ยวกับโครงการ','About the project'],
+    ct_intro_d:['BBL HI PRO คือ Web Experience ที่เสริมแอปพลิเคชัน Bangkok Bank Mobile Banking ด้วยบริการที่เข้าถึงได้สะดวก นอกเหนือจากธุรกรรมหลัก เป็น prototype สำหรับทดสอบประสบการณ์ผู้ใช้','BBL HI PRO is a web experience that complements Bangkok Bank Mobile Banking with convenient services beyond core transactions. This prototype is for testing the user experience.'],
+    f_name:['ชื่อ-นามสกุล','Full name'], f_email:['อีเมล','Email'], f_email_ph:['name@example.com','name@example.com'],
+    f_subject:['หัวข้อ','Subject'], f_message:['ข้อความ','Message'],
+    s_general:['สอบถามทั่วไป','General enquiry'], s_ux:['ข้อเสนอแนะด้านประสบการณ์ใช้งาน','UX feedback'],
+    s_issue:['แจ้งปัญหาการใช้งาน','Report an issue'], s_partner:['ความร่วมมือ','Partnership'],
+    ct_send:['ส่งข้อความ','Send message'], ct_sending:['กำลังส่ง…','Sending…'],
+    ct_proto:['Prototype: ข้อความจะไม่ถูกส่งหรือบันทึกที่ใด','Prototype: messages are not sent or stored anywhere.'],
+    ct_success_t:['ได้รับข้อความแล้ว (จำลอง)','Message received (simulated)'],
+    ct_success_d:['นี่คือการจำลองเท่านั้น ระบบไม่ได้ส่งอีเมลจริง','This is a simulation. No email has been sent.'],
+    ct_again:['เขียนข้อความใหม่','Write another message'],
+    err_name:['กรุณากรอกชื่อ อย่างน้อย 2 ตัวอักษร','Please enter at least 2 characters'],
+    err_email_c:['กรุณากรอกอีเมลให้ถูกต้อง','Please enter a valid email address'],
+    err_subject:['กรุณาเลือกหัวข้อ','Please select a subject'],
+    err_message:['กรุณากรอกข้อความอย่างน้อย 10 ตัวอักษร','Please write at least 10 characters'],
+    chars:['{n}/{max}','{n}/{max}'],
+
+    /* Brand */
+    br_title:['ตัวตนแบรนด์ BBL HI PRO','BBL HI PRO brand identity'],
+    br_sub:['ไอคอนที่เลือกสำหรับ BBL HI PRO และการนำไปใช้ในหน้าเว็บ','The selected icon for BBL HI PRO and how it is applied on the site.'],
+    br_status:['สถานะ: ยืนยันแล้ว','Status: confirmed'],
+    br_foot:['ไอคอนเป็น SVG แยกอิสระ ใช้ใน header, footer, favicon และหน้า Playground','The icon is a standalone SVG, used in the header, footer, favicon and the Playground page.'],
+    br_concept_b:['Concept B · Growth Garden','Concept B · Growth Garden'],
+    br_concept_d:['ต้นกล้าที่งอกจากเส้นฐาน สื่อถึงการเติบโตที่อบอุ่นและเป็นมิตร ได้รับเลือกเป็นตัวตนของ BBL HI PRO','A sprout rising from a baseline, expressing warm, human growth. Selected as the BBL HI PRO identity.'],
+    br_light_t:['บนพื้นสว่าง','On light background'], br_dark_t:['บนพื้นเข้ม','On dark background'],
+    br_sizes_t:['ขนาดการใช้งาน (px)','Size tests (px)'],
+    br_fav_t:['Favicon','Favicon'], br_fav_d:['ทดสอบในแถบแท็บเบราว์เซอร์ที่ขนาด 16 px','Checked in a browser tab at 16 px'],
+    br_rules_t:['หลักการใช้งาน','Usage guidelines'],
+    br_rule1:['เว้นพื้นที่รอบไอคอนอย่างน้อยหนึ่งในสี่ของความกว้าง','Keep clear space around the icon of at least one quarter of its width'],
+    br_rule2:['ขนาดขั้นต่ำ 16 px ถ้าเล็กกว่านี้ให้ใช้ wordmark แทน','Minimum size 16 px. Below that, use the wordmark instead.'],
+    br_rule3:['ใช้เฉพาะเวอร์ชันพื้นสว่างหรือพื้นเข้ม ห้ามเปลี่ยนสีหรือเพิ่มข้อความในไอคอน','Use only the light or dark version. Do not recolor or add text to the icon.'],
+
+    /* Toasts & misc */
+    toast_saved:['ออมเพิ่ม ฿500 แล้ว (จำลอง)','Added ฿500 to savings (simulated)'],
+    toast_goal:['ถึงเป้าหมายทริปญี่ปุ่นแล้ว (จำลอง)','Japan Trip goal reached (simulated)'],
+    toast_doc:['สร้างคำขอ {ref} แล้ว','Request {ref} created'],
+    toast_appt:['จองนัดหมาย {ref} แล้ว','Appointment {ref} booked'],
+    toast_rec:['อัปเดตคำแนะนำแล้ว','Recommendation updated'],
+    toast_ct:['ส่งข้อความแบบจำลองแล้ว','Simulated message sent'],
+    toast_reset:['รีเซ็ตข้อมูลตัวอย่างแล้ว','Mock data reset'],
+    err_generic:['กรุณาตรวจสอบข้อมูลในช่องที่มีเครื่องหมายสีแดง','Please check the fields marked in red'],
+  };
+
+  /* =========================================================
+     2. Core helpers
+     ========================================================= */
+  const $  = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+  const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  let lang = 'th';
+  try { lang = localStorage.getItem('bblhipro-lang') === 'en' ? 'en' : 'th'; } catch (e) {}
+  const idx = () => (lang === 'th' ? 0 : 1);
+  const t = (key, vars) => {
+    let s = (S[key] && S[key][idx()]) || key;
+    if (vars) s = s.replace(/\{(\w+)\}/g, (_, k) => (vars[k] ?? ''));
+    return s;
+  };
+  const locale = () => (lang === 'th' ? 'th-TH' : 'en-GB');
+  const money = n => '฿' + Number(n).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+  const money2 = n => '฿' + Number(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const fmtDate = iso => new Intl.DateTimeFormat(locale(), { day: 'numeric', month: 'short', year: 'numeric' }).format(new Date(iso + 'T00:00:00'));
+  const fmtDay = iso => new Intl.DateTimeFormat(locale(), { weekday: 'short' }).format(new Date(iso + 'T00:00:00'));
+  const fmtDM  = iso => new Intl.DateTimeFormat(locale(), { day: 'numeric', month: 'short' }).format(new Date(iso + 'T00:00:00'));
+  const pad = n => String(n).padStart(2, '0');
+  const isoOf = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+  const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+  /* ---------- Count-up numbers ---------- */
+  function fmtKind(v, kind) {
+    if (kind === 'money') return money2(v);
+    if (kind === 'baht') return money(v);
+    if (kind === 'pct') return Math.round(v) + '%';
+    return Math.round(v).toLocaleString('en-US');
+  }
+  function setNum(el, v) {
+    el.dataset.value = v;
+    el.textContent = fmtKind(v, el.dataset.kind);
+  }
+  function countTo(el, to, dur = 1000) {
+    const from = parseFloat(el.dataset.value);
+    el.dataset.count = to;
+    cancelAnimationFrame(el._raf);
+    if (reduceMotion || isNaN(from) || from === to) return setNum(el, to);
+    const start = performance.now();
+    const step = now => {
+      const p = Math.min(1, (now - start) / dur);
+      const e = 1 - Math.pow(1 - p, 3);
+      setNum(el, from + (to - from) * e);
+      if (p < 1) el._raf = requestAnimationFrame(step);
+    };
+    el._raf = requestAnimationFrame(step);
+  }
+  function animateCounters(root) {
+    $$('[data-count]', root).forEach(el => countTo(el, parseFloat(el.dataset.count)));
+  }
+  function refreshCounters(root = document) {
+    $$('[data-count]', root).forEach(el => setNum(el, parseFloat(el.dataset.count)));
+  }
+
+  /* ---------- Toast ---------- */
+  let toastTimer;
+  function toast(msg) {
+    const el = $('#toast');
+    el.textContent = msg;
+    el.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => el.classList.remove('show'), 2600);
+  }
+
+  /* ---------- Modal ---------- */
+  let lastFocus = null;
+  function openModal({ title, body = '', actions = [] }) {
+    lastFocus = document.activeElement;
+    const wrap = document.createElement('div');
+    wrap.className = 'modal';
+    wrap.innerHTML = `
+      <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="mTitle">
+        <button class="modal-x" type="button" data-m-close aria-label="${esc(t('close'))}">
+          <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-close"/></svg>
+        </button>
+        <h3 id="mTitle">${esc(title)}</h3>
+        <div class="modal-body">${body}</div>
+        <div class="modal-actions"></div>
+      </div>`;
+    const bar = $('.modal-actions', wrap);
+    actions.forEach(a => {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'btn ' + (a.cls || 'ghost');
+      b.textContent = a.label;
+      b.addEventListener('click', () => a.onClick && a.onClick(wrap));
+      bar.appendChild(b);
+    });
+    wrap.addEventListener('click', e => {
+      if (e.target === wrap || e.target.closest('[data-m-close]')) closeModal(wrap);
+    });
+    document.body.appendChild(wrap);
+    const first = $('.btn', wrap) || $('[data-m-close]', wrap);
+    first && first.focus();
+    return wrap;
+  }
+  function closeModal(wrap) {
+    if (!wrap) wrap = $('.modal');
+    if (!wrap) return;
+    wrap.remove();
+    if (lastFocus && lastFocus.focus) lastFocus.focus();
+  }
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+      closeModal($('.modal'));
+      closeNotifs();
+    }
+    if (e.key === 'Tab' && $('.modal')) {
+      // keep keyboard focus inside the open dialog
+      const f = $$('button:not([disabled]), a[href], input, select, textarea', $('.modal'));
+      if (!f.length) return;
+      const first = f[0], last = f[f.length - 1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    }
+    if ((e.key === 'Enter' || e.key === ' ') && e.target.matches && e.target.matches('[data-notif]')) {
+      e.preventDefault();
+      e.target.click();
+    }
+    // arrow-key navigation inside date/time radio groups
+    const group = e.target.closest && e.target.closest('#dateChips, #slots');
+    if (group && ['ArrowRight', 'ArrowDown', 'ArrowLeft', 'ArrowUp'].includes(e.key)) {
+      const items = $$('[role="radio"]:not([disabled])', group);
+      const i = items.indexOf(e.target);
+      if (i < 0) return;
+      e.preventDefault();
+      const next = (e.key === 'ArrowRight' || e.key === 'ArrowDown') ? (i + 1) % items.length : (i - 1 + items.length) % items.length;
+      items[next].focus();
+      items[next].click();
+    }
+  });
+
+  /* =========================================================
+     3. State (mock data only)
+     ========================================================= */
+  const TODAY = new Date(2026, 10, 5); // fixed reference date for the mock
+  const FLOW = { // thousands of baht, Jan–Nov 2026 (last 12 months, ending Nov)
+    income:  [38, 40, 39, 41, 42, 41, 43, 42, 44, 43, 44, 45],
+    expense: [31, 29, 33, 27, 30, 28, 32, 29, 31, 27, 30, 28.76],
+  };
+  const CAT_KEYS = ['cat_food', 'cat_transport', 'cat_bills', 'cat_shop', 'cat_fun'];
+  const CAT_COLORS = ['#0D2B5E', '#1F5BBD', '#C9963A', '#1E8A63', '#8A92A3'];
+  const CAT_NOV = [8450, 2640, 6320, 6980, 4370];      // sums to 28,760 (November)
+  const CAT_BUDGET = [9000, 3000, 6500, 5000, 4500];
+
+  const state = {
+    recDone: [false, false, false],
+    reqSeq: 40500,
+    requests: [
+      { id: 'r1', type: 'doc',  ref: 'BBL-DOC-40218', titleKey: 'opt_statement', date: '2026-10-30', step: 2 },
+      { id: 'r2', type: 'doc',  ref: 'BBL-DOC-40377', titleKey: 'opt_income',    date: '2026-11-03', step: 1 },
+      { id: 'r3', type: 'appt', ref: 'BBL-APT-20931', titleKey: 'pu_loan', branchKey: 'br_silom', date: '2026-11-12', time: '10:30', step: 1 },
+    ],
+    goals: [
+      { id: 'g1', nameKey: 'g_japan', target: 60000, saved: 18500, start: '2026-06-01', date: '2027-03-31' },
+      { id: 'g2', nameKey: 'g_fund', target: 90000, saved: 45000, start: '2026-03-01', date: '2027-06-30' },
+      { id: 'g3', nameKey: 'g_laptop', target: 35000, saved: 35000, start: '2026-08-01', date: '2026-12-31' },
+    ],
+    filter: 'all',
+    apptDate: null,
+    apptTime: null,
+    range: 6,
+    ovIdx: 11,
+    notifs: [
+      { key: 'n1', read: false },
+      { key: 'n2', read: false },
+      { key: 'n3', read: true },
+    ],
+    activity: [
+      { k: 'act_salary', sign: '+', amt: 45000, date: '2026-11-01' },
+      { k: 'act_bill',   sign: '−', amt: 1280,  date: '2026-11-03' },
+      { k: 'act_save',   sign: '−', amt: 5000,  date: '2026-11-04' },
+    ],
+  };
+  const nextRef = prefix => `BBL-${prefix}-${++state.reqSeq}`;
+  let goalSeq = 3;
+  const goalName = g => (g.nameKey ? t(g.nameKey) : g.name);
+  const parseISO = s => new Date(s + 'T00:00:00');
+  const daysBetween = (a, b) => Math.round((b - a) / 86400000);
+  const addYears = (d, n) => new Date(d.getFullYear() + n, d.getMonth(), d.getDate());
+
+  /* Simple, explainable status: done / overdue / behind / on track
+     behind = saved less than 80% of the share of time already elapsed */
+  function goalStatus(g) {
+    if (g.saved >= g.target) return 'done';
+    const end = parseISO(g.date);
+    if (daysBetween(TODAY, end) < 0) return 'overdue';
+    const start = parseISO(g.start);
+    const total = daysBetween(start, end);
+    const elapsed = daysBetween(start, TODAY);
+    const expected = total > 0 ? Math.min(1, Math.max(0, elapsed / total)) : 1;
+    return g.saved / g.target < expected * 0.8 ? 'behind' : 'ontrack';
+  }
+
+  /* Favicon: Icon B (light tile), injected as data URI */
+  const FAVICON_SVG = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="16" fill="#E7F3EC"/>' +
+    '<path d="M32 52V32" fill="none" stroke="#1E8A63" stroke-width="4.5" stroke-linecap="round"/>' +
+    '<path d="M32 38C22 38 16 30 16 20c11 0 16 7 16 18z" fill="#1E8A63"/>' +
+    '<path d="M32 31C32 20 39 12 49 12c0 11-7 19-17 19z" fill="#3FB58A"/>' +
+    '<path d="M14 52h36" fill="none" stroke="#0D2B5E" stroke-width="3.5" stroke-linecap="round" opacity=".55"/></svg>';
+  (function setFavicon() {
+    let link = document.querySelector('link[rel="icon"]');
+    if (!link) { link = document.createElement('link'); link.rel = 'icon'; document.head.appendChild(link); }
+    link.type = 'image/svg+xml';
+    link.href = 'data:image/svg+xml,' + encodeURIComponent(FAVICON_SVG);
+  })();
+
+  /* =========================================================
+     4. Routing & page transitions
+     ========================================================= */
+  const ROUTES = ['home', 'services', 'svc-documents', 'svc-appointment', 'svc-tracking', 'svc-overview',
+                  'wellness', 'goals', 'playground', 'contact', 'brand'];
+  let current = null;
+
+  const routeFromHash = () => {
+    const h = (location.hash || '').replace(/^#\/?/, '');
+    return ROUTES.includes(h) ? h : 'home';
+  };
+
+  function startProgress() {
+    if (reduceMotion) return;
+    const p = $('#progress');
+    p.classList.remove('run');
+    void p.offsetWidth;
+    p.classList.add('run');
+  }
+
+  /* Phase 4: skeletons for data-heavy pages, loading screen on first open */
+  const SKEL_ROUTES = ['home', 'goals', 'wellness', 'svc-overview', 'svc-tracking'];
+  const sk = (cls, n = 1) => Array.from({ length: n }, () => `<div class="skel ${cls}"></div>`).join('');
+  const SKEL_HTML = {
+    home: `${sk('h')}${sk('s')}<div class="skel-row k4">${sk('kpi', 4)}</div><div class="skel-row c2">${sk('tall')}${sk('card')}</div>`,
+    goals: `${sk('h')}${sk('s')}<div class="skel-row k3">${sk('kpi', 3)}</div><div class="skel-row c2">${sk('card', 2)}</div>`,
+    wellness: `${sk('h')}${sk('s')}<div class="skel-row c2">${sk('tall')}${sk('card')}</div>${sk('card')}`,
+    'svc-overview': `${sk('h')}${sk('s')}<div class="skel-row k4">${sk('kpi', 4)}</div>${sk('tall')}`,
+    'svc-tracking': `${sk('h')}${sk('s')}<div class="skel-row" style="grid-auto-flow:column">${sk('chip', 3)}</div>${sk('row', 3)}`,
+  };
+  function showSkeleton(view) {
+    clearTimeout(view._skT);
+    let wrap = view.querySelector(':scope > .skel-wrap');
+    if (!wrap) {
+      wrap = document.createElement('div');
+      wrap.className = 'skel-wrap';
+      wrap.setAttribute('aria-hidden', 'true');
+      wrap.innerHTML = SKEL_HTML[view.id] || '';
+      view.prepend(wrap);
+    }
+    view.classList.add('is-loading');
+    view._skT = setTimeout(() => {
+      view.classList.remove('is-loading');
+      wrap.remove();
+      if (view.classList.contains('active')) view.querySelector('h1')?.focus({ preventScroll: true });
+    }, reduceMotion ? 150 : 420);
+  }
+  function hideSplash() {
+    const sp = document.getElementById('splash');
+    if (!sp) return;
+    sp.classList.add('done');
+    setTimeout(() => sp.remove(), 500);
+  }
+
+  function go(route, { skipProgress = false } = {}) {
+    if (!ROUTES.includes(route)) route = 'home';
+    if (route === current) return;
+    const isFirst = current === null;
+    current = route;
+    if (!isFirst && !skipProgress) {
+      startProgress();
+      const mark = $('.wordmark .bm');
+      mark.classList.remove('grow'); void mark.offsetWidth; mark.classList.add('grow');
+    }
+
+    $$('.view').forEach(v => v.classList.toggle('active', v.id === route));
+    const parent = route.startsWith('svc-') ? 'services' : route;
+    $$('[data-nav]').forEach(a => {
+      const on = a.dataset.nav === parent;
+      a.classList.toggle('active', on);
+      if (on) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
+    });
+
+    const view = document.getElementById(route);
+    $$('.reveal', view).forEach((el, i) => el.style.setProperty('--i', i));
+
+    const skel = !isFirst && SKEL_ROUTES.includes(route);
+    if (!isFirst) window.scrollTo({ top: 0, behavior: 'auto' });
+    if (skel) showSkeleton(view);
+    else if (!isFirst) view.querySelector('h1')?.focus({ preventScroll: true });
+    if (location.hash !== '#' + route) history.replaceState(null, '', '#' + route);
+
+    onEnter(route, view);
+  }
+
+  function onEnter(route, view) {
+    if (route === 'home') { renderHome(); animateCounters(view); requestAnimationFrame(() => $('#chart').classList.add('grow')); animateGoal(); }
+    if (route === 'svc-tracking') renderRequests();
+    if (route === 'svc-overview') { renderOverview(); }
+    if (route === 'wellness') { renderWellness(); animateCounters(view); animateRing(); }
+    if (route === 'goals') renderGoals();
+    if (route === 'svc-appointment') { renderDates(); renderSlots(); }
+    if (route === 'svc-documents') { syncDocEmail(); }
+  }
+
+  window.addEventListener('hashchange', () => go(routeFromHash()));
+  document.addEventListener('click', e => {
+    const g = e.target.closest('[data-go]');
+    if (g) { e.preventDefault(); location.hash = '#' + g.dataset.go; }
+  });
+  $('#skipBtn').addEventListener('click', () => {
+    const h = $('.view.active h1');
+    h && h.focus();
+  });
+
+  /* =========================================================
+     5. Language switch
+     ========================================================= */
+  function applyStatic() {
+    document.documentElement.lang = lang === 'th' ? 'th' : 'en';
+    document.title = lang === 'th' ? 'BBL HI PRO — Web Preview' : 'BBL HI PRO — Web Preview';
+    $$('[data-i18n]').forEach(el => { el.textContent = t(el.dataset.i18n); });
+    $$('[data-i18n-ph]').forEach(el => { el.placeholder = t(el.dataset.i18nPh); });
+    $$('[data-i18n-aria]').forEach(el => { el.setAttribute('aria-label', t(el.dataset.i18nAria)); });
+    $$('[data-i18n-txt]').forEach(el => { el.textContent = t(el.dataset.i18nTxt); });
+    $$('.lang-btn').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.lang === lang)));
+  }
+
+  function setLang(next) {
+    if (next === lang) return;
+    document.body.classList.add('lang-out');
+    setTimeout(() => {
+      lang = next;
+      try { localStorage.setItem('bblhipro-lang', lang); } catch (e) {}
+      applyStatic();
+      renderAll();
+      document.body.classList.remove('lang-out');
+    }, reduceMotion ? 0 : 180);
+  }
+  $$('.lang-btn').forEach(b => b.addEventListener('click', () => setLang(b.dataset.lang)));
+
+  /* =========================================================
+     6. Home
+     ========================================================= */
+  function renderHome() {
+    const h = new Date().getHours();
+    const period = h < 12 ? 'morning' : h < 17 ? 'afternoon' : 'evening';
+    $('#greet').textContent = t('greet_' + period);
+    $('#homeTitle').textContent = t('hello_name');
+    renderChart();
+    renderGoal();
+    renderActivity();
+    renderNotifs();
+    renderResume();
+  }
+
+  function renderResume() {
+    const r = state.requests.find(x => !isFinal(x));
+    state.resumeId = r ? r.id : null;
+    if (r) {
+      $('#resumeTitle').textContent = reqTitle(r);
+      $('#resumeMeta').textContent = `${t(STEP_KEYS[r.type][r.step])} · ${reqMeta(r)}`;
+      $('#resumeBtn').textContent = t('resume_cta');
+    } else {
+      $('#resumeTitle').textContent = t('resume_none');
+      $('#resumeMeta').textContent = t('resume_none_d');
+      $('#resumeBtn').textContent = t('resume_new');
+    }
+  }
+  $('#resumeBtn').addEventListener('click', () => {
+    if (state.resumeId) openRequest(state.resumeId);
+    else location.hash = '#svc-documents';
+  });
+
+  function renderGoal() {
+    const g = state.goals[0];
+    $('#goalTitle').textContent = goalName(g);
+    countTo($('#cGoal'), g.saved, 800);
+    $('#goalTarget').textContent = '/ ' + money(g.target);
+    const remain = Math.max(0, g.target - g.saved);
+    $('#goalRemain').textContent = remain > 0 ? t('goal_remain', { amt: money(remain) }) : t('goal_done');
+    const btn = $('#goalAdd');
+    btn.textContent = t('goal_add');
+    btn.disabled = remain === 0;
+    const pct = Math.min(100, g.saved / g.target * 100);
+    $('#goalBar').style.width = pct + '%';
+    const bar = $('#goalBar').closest('.bar');
+    bar.setAttribute('aria-valuemax', g.target);
+    bar.setAttribute('aria-valuenow', g.saved);
+  }
+  function animateGoal() { renderGoal(); }
+
+  function simulateSave(id, amt, fromList = false) {
+    const g = state.goals.find(x => x.id === id);
+    if (!g || g.saved >= g.target) return;
+    const before = g.saved;
+    g.saved = Math.min(g.target, g.saved + amt);
+    const added = g.saved - before;
+    renderGoal();
+    renderGoals();
+    const hi = document.querySelector(`#goalList [data-sim="${id}"]`)?.closest('.goal-item') || document.querySelector('.goal-card');
+    if (hi && id === state.goals[0].id) document.querySelector('.goal-card')?.classList.add('bump');
+    if (hi) { hi.classList.remove('bump'); void hi.offsetWidth; hi.classList.add('bump'); }
+    if (g.saved >= g.target) toast(t('toast_goal_done', { name: goalName(g) }));
+    else toast(t('toast_goal_add', { amt: money(added) }));
+    if (fromList) { const b = document.querySelector(`[data-sim="${id}"]`); b && b.focus(); }
+  }
+  $('#goalAdd').addEventListener('click', () => simulateSave(state.goals[0].id, 500));
+
+  function renderActivity() {
+    $('#activity').innerHTML = state.activity.map(a => `
+      <li>
+        <div><b>${t(a.k)}</b><div class="when">${fmtDate(a.date)}</div></div>
+        <span class="amt ${a.sign === '+' ? 'in' : ''} num">${a.sign}${money2(a.amt)}</span>
+      </li>`).join('');
+  }
+
+  function renderChart() {
+    const n = state.range;
+    const inc = FLOW.income.slice(-n);
+    const exp = FLOW.expense.slice(-n);
+    const max = Math.max(...inc, ...exp) * 1.12;
+    const now = new Date(2026, 10, 1);
+    const cols = inc.map((v, i) => {
+      const d = new Date(now.getFullYear(), now.getMonth() - (n - 1 - i), 1);
+      const label = new Intl.DateTimeFormat(locale(), { month: 'short' }).format(d);
+      const full = new Intl.DateTimeFormat(locale(), { month: 'long', year: 'numeric' }).format(d);
+      const hi = (v / max) * 100, he = (exp[i] / max) * 100;
+      const delay = reduceMotion ? 0 : i * 45;
+      return `<div class="col" tabindex="0" aria-label="${esc(full)}: ${esc(t('legend_income'))} ${money(v * 1000)}, ${esc(t('legend_expenses'))} ${money(exp[i] * 1000)}">
+        <div class="bars">
+          <span class="bi" style="height:${hi}%;--d:${delay}ms" title="${esc(t('legend_income'))}: ${money(v * 1000)}"></span>
+          <span class="be" style="height:${he}%;--d:${delay + 80}ms" title="${esc(t('legend_expenses'))}: ${money(exp[i] * 1000)}"></span>
+        </div>
+        <span class="m">${esc(label)}</span>
+      </div>`;
+    }).join('');
+    const chart = $('#chart');
+    chart.classList.remove('grow');
+    chart.innerHTML = cols;
+    if (current === 'home') requestAnimationFrame(() => chart.classList.add('grow'));
+    $$('.seg [data-range]').forEach(b => b.setAttribute('aria-pressed', String(Number(b.dataset.range) === n)));
+  }
+
+  $$('[data-range]').forEach(b => b.addEventListener('click', () => {
+    state.range = Number(b.dataset.range);
+    renderChart();
+  }));
+
+  /* =========================================================
+     7a. Financial Goals (mock; no backend)
+     ========================================================= */
+  const ST_CLASS = { done: 'st-done', ontrack: 'st-ontrack', behind: 'st-behind', overdue: 'st-overdue' };
+
+  function renderGoals() {
+    const total = state.goals.reduce((a, g) => a + g.saved, 0);
+    const done = state.goals.filter(g => g.saved >= g.target).length;
+    setNum($('#gkCount'), state.goals.length);
+    setNum($('#gkSaved'), total);
+    setNum($('#gkDone'), done);
+    $('#goalEmpty').hidden = state.goals.length > 0;
+    $('#goalList').innerHTML = state.goals.map(g => {
+      const st = goalStatus(g);
+      const isDone = st === 'done';
+      const pct = Math.min(100, Math.round(g.saved / g.target * 100));
+      const remain = Math.max(0, g.target - g.saved);
+      const months = Math.max(1, Math.ceil(daysBetween(TODAY, parseISO(g.date)) / 30));
+      const sugg = Math.ceil(remain / months / 100) * 100;
+      const name = goalName(g);
+      return `
+      <article class="card lift goal-item reveal" style="--i:0">
+        <header class="gi-head">
+          <div>
+            <h2 class="gi-name" id="gn-${g.id}">${esc(name)}</h2>
+            <p class="muted small">${esc(t('goal_deadline', { date: fmtDate(g.date) }))}</p>
+          </div>
+          <span class="pill ${ST_CLASS[st]}">${esc(t('st_' + st))}</span>
+        </header>
+        <div class="gi-figs">
+          <strong class="gi-saved num">${esc(money(g.saved))}</strong>
+          <span class="muted">/ ${esc(money(g.target))}</span>
+        </div>
+        <div class="bar ${isDone ? 'green' : ''}" role="progressbar" aria-labelledby="gn-${g.id}" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${pct}">
+          <i style="width:${pct}%"></i>
+        </div>
+        <p class="small muted">${esc(t('goal_pct', { p: pct }))} · ${esc(isDone ? t('goal_suggest_done') : t('goal_left', { amt: money(remain) }))}</p>
+        ${!isDone && st !== 'overdue' ? `<p class="small">${esc(t('goal_suggest', { amt: money(sugg) }))}</p>` : ''}
+        <div class="gi-actions">
+          <select class="select sel-sm" aria-label="${esc(t('goal_sim_amt'))}" data-sim-amt="${g.id}" ${isDone ? 'disabled' : ''}>
+            <option value="100">฿100</option>
+            <option value="500" selected>฿500</option>
+            <option value="1000">฿1,000</option>
+          </select>
+          <button class="btn ghost" type="button" data-sim="${g.id}" ${isDone ? 'disabled' : ''}>${esc(t('goal_sim'))}</button>
+          <button class="btn text" type="button" data-edit="${g.id}">${esc(t('goal_edit'))}</button>
+        </div>
+      </article>`;
+    }).join('');
+  }
+
+  $('#goalList').addEventListener('click', e => {
+    const sim = e.target.closest('[data-sim]');
+    if (sim) {
+      const sel = document.querySelector(`[data-sim-amt="${sim.dataset.sim}"]`);
+      simulateSave(sim.dataset.sim, Number(sel.value), true);
+      return;
+    }
+    const ed = e.target.closest('[data-edit]');
+    if (ed) openGoalForm(ed.dataset.edit);
+  });
+  $('#goalNew').addEventListener('click', () => openGoalForm(null));
+  $('#goalNew2').addEventListener('click', () => openGoalForm(null));
+
+  /* Create / edit form inside a modal */
+  function openGoalForm(id) {
+    const g = id ? state.goals.find(x => x.id === id) : null;
+    const minDate = isoOf(new Date(TODAY.getFullYear(), TODAY.getMonth(), TODAY.getDate() + 1));
+    const maxDate = isoOf(addYears(TODAY, 10));
+    const body = `
+      <form id="gForm" novalidate>
+        <div class="err-summary" id="gErrSum" role="alert" hidden></div>
+        <div class="field">
+          <label for="gName">${esc(t('gf_name'))}</label>
+          <input class="input" id="gName" type="text" maxlength="40" value="${esc(g ? goalName(g) : '')}" placeholder="${esc(t('gf_name_ph'))}" aria-describedby="errGName">
+          <p class="err" id="errGName"></p>
+        </div>
+        <div class="field">
+          <label for="gTarget">${esc(t('gf_target'))}</label>
+          <input class="input" id="gTarget" type="number" inputmode="numeric" min="1000" max="10000000" step="100" value="${g ? g.target : 30000}" aria-describedby="errGTarget">
+          <p class="err" id="errGTarget"></p>
+        </div>
+        <div class="field">
+          <label for="gDate">${esc(t('gf_date'))}</label>
+          <input class="input" id="gDate" type="date" min="${minDate}" max="${maxDate}" value="${g ? g.date : minDate}" aria-describedby="errGDate">
+          <p class="err" id="errGDate"></p>
+        </div>
+        <div class="field">
+          <label for="gSaved">${esc(t('gf_saved'))}</label>
+          <input class="input" id="gSaved" type="number" inputmode="numeric" min="0" step="100" value="${g ? g.saved : 0}" aria-describedby="errGSaved">
+          <p class="err" id="errGSaved"></p>
+        </div>
+      </form>`;
+    const wrap = openModal({
+      title: t(g ? 'gf_title_edit' : 'gf_title_new'),
+      body,
+      actions: [
+        { label: t('cancel'), cls: 'ghost', onClick: m => closeModal(m) },
+        { label: t('gf_save'), cls: 'primary', onClick: m => saveGoal(m, g) },
+      ],
+    });
+    $('#gName', wrap).focus();
+    wrap.querySelectorAll('#gForm input').forEach(i => i.addEventListener('keydown', e => {
+      if (e.key === 'Enter') { e.preventDefault(); saveGoal(wrap, g); }
+    }));
+  }
+
+  function saveGoal(m, g) {
+    const items = [];
+    const fail = (inputId, errId, msg) => { setErr($('#' + inputId, m), $('#' + errId, m), msg); items.push({ id: inputId, msg }); };
+    const pass = (inputId, errId) => setErr($('#' + inputId, m), $('#' + errId, m), '');
+
+    const name = $('#gName', m).value.trim();
+    if (name.length < 2 || name.length > 40) fail('gName', 'errGName', t('err_gname')); else pass('gName', 'errGName');
+
+    const target = Number($('#gTarget', m).value);
+    if (!Number.isInteger(target) || target < 1000 || target > 10000000) fail('gTarget', 'errGTarget', t('err_gtarget'));
+    else pass('gTarget', 'errGTarget');
+
+    const dateVal = $('#gDate', m).value;
+    const dateOk = !!dateVal && daysBetween(TODAY, parseISO(dateVal)) >= 1 && parseISO(dateVal) <= addYears(TODAY, 10);
+    if (!dateOk) fail('gDate', 'errGDate', t('err_gdate')); else pass('gDate', 'errGDate');
+
+    const saved = Number($('#gSaved', m).value);
+    if (!Number.isFinite(saved) || saved < 0 || (target && saved > target)) fail('gSaved', 'errGSaved', t('err_gsaved'));
+    else pass('gSaved', 'errGSaved');
+
+    showErrSummary($('#gErrSum', m), items);
+    if (items.length) return;
+
+    if (g) {
+      const keepKey = g.nameKey && name === t(g.nameKey);
+      Object.assign(g, { nameKey: keepKey ? g.nameKey : null, name: keepKey ? undefined : name, target, saved, date: dateVal });
+    } else {
+      state.goals.push({ id: 'g' + (++goalSeq), name, nameKey: null, target, saved, start: isoOf(TODAY), date: dateVal });
+    }
+    closeModal(m);
+    renderGoals();
+    renderGoal();
+    toast(t('toast_goal_saved'));
+  }
+
+  /* =========================================================
+     7. Notifications
+     ========================================================= */
+  function renderNotifs() {
+    $('#notifList').innerHTML = state.notifs.map(n => `
+      <li class="notif-item ${n.read ? 'read' : ''}" data-notif="${n.key}" tabindex="0" role="button">
+        <i class="u"></i>
+        <div><b>${t(n.key + '_t')}</b><span>${t(n.key + '_b')}</span></div>
+      </li>`).join('');
+    const unread = state.notifs.filter(n => !n.read).length;
+    $('#bellDot').classList.toggle('off', unread === 0);
+  }
+  function closeNotifs() {
+    $('#notifPanel').hidden = true;
+    $('#bellBtn').setAttribute('aria-expanded', 'false');
+  }
+  $('#bellBtn').addEventListener('click', e => {
+    e.stopPropagation();
+    const open = $('#notifPanel').hidden;
+    $('#notifPanel').hidden = !open;
+    $('#bellBtn').setAttribute('aria-expanded', String(open));
+  });
+  document.addEventListener('click', e => {
+    if (!e.target.closest('.notif')) closeNotifs();
+    const item = e.target.closest('[data-notif]');
+    if (item) {
+      const n = state.notifs.find(x => x.key === item.dataset.notif);
+      if (n) n.read = true;
+      renderNotifs();
+    }
+  });
+  $('#markRead').addEventListener('click', () => {
+    state.notifs.forEach(n => (n.read = true));
+    renderNotifs();
+  });
+
+  /* Error summary: lists every problem, each link moves focus to the field */
+  function showErrSummary(box, items) {
+    if (!items.length) { box.hidden = true; box.innerHTML = ''; return; }
+    box.innerHTML = `<b>${esc(t('err_summary'))}</b><ul>${items.map(it =>
+      `<li><a href="#${it.id}" data-err-target="${it.id}">${esc(it.msg)}</a></li>`).join('')}</ul>`;
+    box.hidden = false;
+    box.focus();
+  }
+  document.addEventListener('click', e => {
+    const a = e.target.closest('[data-err-target]');
+    if (!a) return;
+    e.preventDefault();
+    const el = document.getElementById(a.dataset.errTarget);
+    el && el.focus();
+  });
+
+  /* =========================================================
+     8. Services — document request
+     ========================================================= */
+  const docForm = $('#docForm');
+  const docType = $('#docType');
+  const docCopies = $('#docCopies');
+  const docEmail = $('#docEmail');
+
+  function setErr(el, msgEl, msg) {
+    if (msg) {
+      msgEl.textContent = msg;
+      msgEl.classList.add('show');
+      el.classList.add('invalid');
+      el.setAttribute('aria-invalid', 'true');
+    } else {
+      msgEl.textContent = '';
+      msgEl.classList.remove('show');
+      el.classList.remove('invalid');
+      el.removeAttribute('aria-invalid');
+    }
+  }
+
+  function getDelivery() {
+    const r = docForm.querySelector('input[name="delivery"]:checked');
+    return r ? r.value : 'email';
+  }
+  function syncDocEmail() {
+    const email = getDelivery() === 'email';
+    $('#emailField').hidden = !email;
+  }
+  docForm.addEventListener('change', e => {
+    if (e.target.name === 'delivery') {
+      syncDocEmail();
+      setErr(docEmail, $('#errDocEmail'), '');
+    }
+  });
+
+  function clampCopies() {
+    let v = parseInt(docCopies.value, 10);
+    if (isNaN(v)) v = 1;
+    v = Math.min(5, Math.max(1, v));
+    docCopies.value = v;
+    $('#copiesMinus').disabled = v <= 1;
+    $('#copiesPlus').disabled = v >= 5;
+    return v;
+  }
+  $('#copiesMinus').addEventListener('click', () => { docCopies.value = clampCopies() - 1; clampCopies(); });
+  $('#copiesPlus').addEventListener('click', () => { docCopies.value = clampCopies() + 1; clampCopies(); });
+  docCopies.addEventListener('change', () => clampCopies());
+
+  const docPeriod = $('#docPeriod');
+  const docReview = $('#docReview');
+  const docErrSum = $('#docErrSum');
+  let docDraft = null;
+
+  function validateDoc() {
+    const items = [];
+    if (!docType.value) { setErr(docType, $('#errDocType'), t('err_doc_type')); items.push({ id: 'docType', msg: t('err_doc_type') }); }
+    else setErr(docType, $('#errDocType'), '');
+
+    const n = parseInt(docCopies.value, 10);
+    if (isNaN(n) || n < 1 || n > 5) { setErr(docCopies, $('#errCopies'), t('err_copies')); items.push({ id: 'docCopies', msg: t('err_copies') }); }
+    else setErr(docCopies, $('#errCopies'), '');
+
+    if (getDelivery() === 'email') {
+      const v = docEmail.value.trim();
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v)) { setErr(docEmail, $('#errDocEmail'), t('err_email')); items.push({ id: 'docEmail', msg: t('err_email') }); }
+      else setErr(docEmail, $('#errDocEmail'), '');
+    }
+    showErrSummary(docErrSum, items);
+    return items.length === 0;
+  }
+
+  function docValues() {
+    return {
+      type: docType.value,
+      typeTxt: docType.options[docType.selectedIndex].text,
+      periodTxt: docPeriod.options[docPeriod.selectedIndex].text,
+      copies: parseInt(docCopies.value, 10),
+      delivery: getDelivery(),
+      email: docEmail.value.trim(),
+    };
+  }
+  function docTypeKey(v) {
+    return { statement: 'opt_statement', income: 'opt_income', balance: 'opt_balance', tax: 'opt_tax' }[v];
+  }
+  function renderDocReview(v) {
+    $('#docReviewList').innerHTML = `
+      <div><span>${esc(t('doc_type'))}</span><b>${esc(v.typeTxt)}</b></div>
+      <div><span>${esc(t('doc_period'))}</span><b>${esc(v.periodTxt)}</b></div>
+      <div><span>${esc(t('doc_copies'))}</span><b>${v.copies}</b></div>
+      <div><span>${esc(t('doc_delivery'))}</span><b>${esc(t(v.delivery === 'email' ? 'del_email' : 'del_branch'))}${v.delivery === 'email' ? ' · ' + esc(v.email) : ''}</b></div>`;
+  }
+
+  docForm.addEventListener('submit', e => {
+    e.preventDefault();
+    if (!validateDoc()) { toast(t('err_generic')); return; }
+    docDraft = docValues();
+    renderDocReview(docDraft);
+    docForm.hidden = true;
+    docReview.hidden = false;
+    $('#docReview h2').focus();
+  });
+
+  $('#docEdit').addEventListener('click', () => {
+    docReview.hidden = true;
+    docForm.hidden = false;
+    docType.focus();
+  });
+
+  $('#docConfirm').addEventListener('click', () => {
+    const btn = $('#docConfirm');
+    btn.disabled = true;
+    $('#docEdit').disabled = true;
+    btn.innerHTML = `<span class="spin" aria-hidden="true"></span>${esc(t('processing'))}`;
+    setTimeout(() => {
+      const ref = nextRef('DOC');
+      state.requests.unshift({ id: ref, type: 'doc', ref, titleKey: docTypeKey(docDraft.type), date: isoOf(TODAY), step: 0 });
+      docReview.hidden = true;
+      btn.disabled = false;
+      btn.textContent = t('doc_confirm');
+      $('#docEdit').disabled = false;
+      $('#docRef').textContent = ref;
+      const succ = $('#docSuccess');
+      succ.hidden = false;
+      succ.classList.remove('play'); void succ.offsetWidth; succ.classList.add('play');
+      toast(t('toast_doc', { ref }));
+      renderRequests();
+      renderResume();
+    }, reduceMotion ? 0 : 700);
+  });
+
+  $('#docAgain').addEventListener('click', () => {
+    docForm.reset();
+    docCopies.value = 1;
+    clampCopies();
+    syncDocEmail();
+    $$('#docForm .err').forEach(el => { el.textContent = ''; el.classList.remove('show'); });
+    $$('#docForm .invalid').forEach(el => el.classList.remove('invalid'));
+    docForm.hidden = false;
+    docReview.hidden = true;
+    showErrSummary(docErrSum, []);
+    $('#docSuccess').hidden = true;
+    docType.focus();
+  });
+
+  /* =========================================================
+     9. Services — appointment
+     ========================================================= */
+  const apptForm = $('#apptForm');
+  const apptBranch = $('#apptBranch');
+  const apptPurpose = $('#apptPurpose');
+  const SLOTS = ['09:00', '10:00', '11:00', '13:00', '14:00', '15:00', '16:00'];
+
+  function workingDays(n = 6) {
+    const out = [];
+    const d = new Date(2026, 10, 5);
+    while (out.length < n) {
+      d.setDate(d.getDate() + 1);
+      if (d.getDay() !== 0 && d.getDay() !== 6) out.push(isoOf(d));
+    }
+    return out;
+  }
+  const DAYS = workingDays(6);
+
+  const BRANCHES = ['silom', 'sukhumvit', 'siam', 'chatuchak'];
+  function isTaken(dayIdx, slotIdx) {
+    const bi = Math.max(0, BRANCHES.indexOf(apptBranch.value));
+    return (dayIdx * 3 + slotIdx * 2 + bi) % 5 === 0;
+  }
+
+  function renderDates() {
+    $('#dateChips').innerHTML = DAYS.map((iso, i) => `
+      <button type="button" class="date-chip" role="radio" aria-checked="${state.apptDate === i}" data-date="${i}">
+        <small>${esc(fmtDay(iso))}</small>
+        <strong>${esc(fmtDM(iso))}</strong>
+      </button>`).join('');
+  }
+
+  function renderSlots() {
+    const box = $('#slots');
+    if (state.apptDate === null) {
+      box.innerHTML = `<span class="muted" style="font-size:.88rem">${esc(t('err_date'))}</span>`;
+      return;
+    }
+    box.innerHTML = SLOTS.map((s, i) => {
+      const taken = isTaken(state.apptDate, i);
+      const sel = state.apptTime === s;
+      return `<button type="button" class="slot" role="radio" aria-checked="${sel}" ${taken ? 'disabled aria-disabled="true"' : ''} data-slot="${s}" title="${taken ? esc(t('slot_full')) : s}">
+        ${s}${taken ? ' · ' + esc(t('slot_full')) : ''}
+      </button>`;
+    }).join('');
+  }
+
+  $('#dateChips').addEventListener('click', e => {
+    const b = e.target.closest('[data-date]');
+    if (!b) return;
+    state.apptDate = Number(b.dataset.date);
+    state.apptTime = null;
+    renderDates();
+    renderSlots();
+    renderApptSummary();
+    setErr($('#dateChips'), $('#errDate'), '');
+  });
+
+  $('#slots').addEventListener('click', e => {
+    const b = e.target.closest('[data-slot]');
+    if (!b || b.disabled) return;
+    state.apptTime = b.dataset.slot;
+    renderSlots();
+    renderApptSummary();
+    setErr($('#slots'), $('#errTime'), '');
+  });
+
+  function updateNotes() {
+    const n = $('#apptNotes').value.length;
+    $('#notesCount').textContent = t('chars', { n, max: 200 });
+  }
+  $('#apptNotes').addEventListener('input', updateNotes);
+
+  apptBranch.addEventListener('change', () => {
+    setErr(apptBranch, $('#errBranch'), '');
+    state.apptTime = null;
+    renderSlots();
+    renderApptSummary();
+  });
+  apptPurpose.addEventListener('change', () => { setErr(apptPurpose, $('#errPurpose'), ''); renderApptSummary(); });
+
+  function renderApptSummary() {
+    const na = `<span class="muted">${esc(t('not_selected'))}</span>`;
+    $('#sumBranch').innerHTML = apptBranch.value ? esc(apptBranch.options[apptBranch.selectedIndex].text) : na;
+    $('#sumPurpose').innerHTML = apptPurpose.value ? esc(apptPurpose.options[apptPurpose.selectedIndex].text) : na;
+    $('#sumWhen').innerHTML = state.apptDate !== null
+      ? esc(fmtDate(DAYS[state.apptDate]) + (state.apptTime ? ' · ' + state.apptTime : '')) : na;
+  }
+
+  function validateAppt() {
+    const items = [];
+    if (!apptBranch.value) { setErr(apptBranch, $('#errBranch'), t('err_branch')); items.push({ id: 'apptBranch', msg: t('err_branch') }); }
+    else setErr(apptBranch, $('#errBranch'), '');
+    if (!apptPurpose.value) { setErr(apptPurpose, $('#errPurpose'), t('err_purpose')); items.push({ id: 'apptPurpose', msg: t('err_purpose') }); }
+    else setErr(apptPurpose, $('#errPurpose'), '');
+    if (state.apptDate === null) { $('#errDate').textContent = t('err_date'); $('#errDate').classList.add('show'); items.push({ id: 'dateChips', msg: t('err_date') }); }
+    else $('#errDate').classList.remove('show');
+    if (!state.apptTime) { $('#errTime').textContent = t('err_time'); $('#errTime').classList.add('show'); items.push({ id: 'slots', msg: t('err_time') }); }
+    else $('#errTime').classList.remove('show');
+    showErrSummary($('#apptErrSum'), items);
+    return items.length === 0;
+  }
+
+  apptForm.addEventListener('submit', e => {
+    e.preventDefault();
+    if (!validateAppt()) { toast(t('err_generic')); return; }
+    const branchTxt = apptBranch.options[apptBranch.selectedIndex].text;
+    const purposeTxt = apptPurpose.options[apptPurpose.selectedIndex].text;
+    const dayIso = DAYS[state.apptDate];
+    const dateTxt = fmtDate(dayIso);
+    const time = state.apptTime;
+    const body = `
+      <div class="summary">
+        <div><span>${esc(t('sum_branch'))}</span><b>${esc(branchTxt)}</b></div>
+        <div><span>${esc(t('sum_purpose'))}</span><b>${esc(purposeTxt)}</b></div>
+        <div><span>${esc(t('sum_when'))}</span><b>${esc(dateTxt)} · ${esc(time)}</b></div>
+      </div>`;
+    openModal({
+      title: t('appt_confirm_t'),
+      body,
+      actions: [
+        { label: t('cancel'), cls: 'ghost', onClick: m => closeModal(m) },
+        { label: t('confirm'), cls: 'primary', onClick: m => {
+            const btn = m.querySelector('.modal-actions .btn.primary');
+            btn.disabled = true;
+            btn.innerHTML = `<span class="spin" aria-hidden="true"></span>${esc(t('processing'))}`;
+            setTimeout(() => {
+              const ref = nextRef('APT');
+              state.requests.unshift({ id: ref, type: 'appt', ref,
+                titleKey: { invest: 'pu_invest', account: 'pu_account', loan: 'pu_loan', general: 'pu_general' }[apptPurpose.value],
+                branchKey: 'br_' + apptBranch.value, date: dayIso, time, step: 0 });
+              closeModal(m);
+              apptForm.hidden = true;
+              $('#apptRef').textContent = ref;
+              $('#apptDoneText').textContent = t('appt_done_text', { branch: branchTxt, date: dateTxt, time });
+              const succ = $('#apptSuccess');
+              succ.hidden = false;
+              succ.classList.remove('play'); void succ.offsetWidth; succ.classList.add('play');
+              toast(t('toast_appt', { ref }));
+              renderRequests();
+              renderResume();
+            }, reduceMotion ? 0 : 600);
+        } },
+      ],
+    });
+  });
+
+  $('#apptAgain').addEventListener('click', () => {
+    apptForm.reset();
+    apptForm.hidden = false;
+    $('#apptSuccess').hidden = true;
+    state.apptDate = null;
+    state.apptTime = null;
+    $$('#apptForm .invalid').forEach(el => el.classList.remove('invalid'));
+    $$('#apptForm .err').forEach(el => { el.textContent = ''; el.classList.remove('show'); });
+    renderDates();
+    renderSlots();
+    renderApptSummary();
+    updateNotes();
+    showErrSummary($('#apptErrSum'), []);
+    apptBranch.focus();
+  });
+
+  /* =========================================================
+     10. Services — tracking
+     ========================================================= */
+  const STEP_KEYS = {
+    doc:  ['status_submitted', 'status_processing', 'status_ready'],
+    appt: ['status_booked', 'status_confirmed', 'status_completed'],
+  };
+  const isFinal = r => r.step === 2;
+  const pillFor = r => (r.step === 2 ? 'green' : r.step === 1 ? 'blue' : '');
+
+  function reqTitle(r) { return t(r.titleKey); }
+  function reqMeta(r) {
+    if (r.type === 'appt') return `${t(r.branchKey)} · ${fmtDate(r.date)} · ${r.time}`;
+    return fmtDate(r.date);
+  }
+  function icon(r) { return r.type === 'doc' ? 'i-doc' : 'i-cal'; }
+
+  function renderRequests() {
+    const list = state.requests.filter(r => {
+      if (state.filter === 'active') return !isFinal(r);
+      if (state.filter === 'done') return isFinal(r);
+      return true;
+    });
+    $('#reqCount').textContent = t('req_count', { n: list.length });
+    $('#reqEmpty').hidden = list.length > 0;
+    $('#reqList').innerHTML = list.map(r => `
+      <li>
+        <button class="req" type="button" data-req="${r.id}" aria-label="${esc(reqTitle(r))} ${esc(r.ref)}">
+          <span class="qi"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><use href="#${icon(r)}"/></svg></span>
+          <span style="min-width:0">
+            <b style="display:block">${esc(reqTitle(r))}</b>
+            <span class="meta" style="display:block">${esc(t(r.type === 'doc' ? 'type_doc' : 'type_appt'))} · ${esc(reqMeta(r))}</span>
+            <span class="ref-s" style="display:block">${esc(r.ref)}</span>
+            <span class="steps" aria-hidden="true">
+              ${[0, 1, 2].map(i => `<i class="${i < r.step ? 'done' : i === r.step ? 'on' : ''}"></i>`).join('')}
+            </span>
+          </span>
+          <span class="pill ${pillFor(r)}">${esc(t(STEP_KEYS[r.type][r.step]))}</span>
+        </button>
+      </li>`).join('');
+    $$('.filter-bar [data-filter]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.filter === state.filter)));
+  }
+
+  $$('.filter-bar [data-filter]').forEach(b => b.addEventListener('click', () => {
+    state.filter = b.dataset.filter;
+    renderRequests();
+  }));
+
+  function timelineHTML(r) {
+    return `<ul class="timeline">${STEP_KEYS[r.type].map((k, i) => {
+      const cls = i < r.step ? 'done' : i === r.step ? 'now' : '';
+      const mark = i < r.step ? '<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-check"/></svg>' : '';
+      return `<li class="${cls}"><span class="dot">${mark}</span><div><b>${esc(t(k))}</b></div></li>`;
+    }).join('')}</ul>`;
+  }
+
+  function openRequest(id) {
+    const r = state.requests.find(x => x.id === id);
+    if (!r) return;
+    const body = `
+      <div class="summary">
+        <div><span>${esc(t('req_ref'))}</span><b>${esc(r.ref)}</b></div>
+        <div><span>${esc(t('req_date_lbl'))}</span><b>${esc(reqMeta(r))}</b></div>
+      </div>
+      ${timelineHTML(r)}`;
+    const m = openModal({
+      title: reqTitle(r),
+      body,
+      actions: [
+        { label: t('close'), cls: 'ghost', onClick: mm => closeModal(mm) },
+        { label: isFinal(r) ? t('track_done_msg') : t('track_next'), cls: 'primary', onClick: mm => {
+            if (isFinal(r)) return toast(t('track_done_msg'));
+            r.step += 1;
+            renderRequests();
+            closeModal(mm);
+            toast(t('track_next_msg', { status: t(STEP_KEYS[r.type][r.step]) }));
+            openRequest(r.id);
+        } },
+      ],
+    });
+    if (isFinal(r)) { const b = m.querySelector('.modal-actions .btn.primary'); b.disabled = true; }
+  }
+
+  $('#reqList').addEventListener('click', e => {
+    const b = e.target.closest('[data-req]');
+    if (b) openRequest(b.dataset.req);
+  });
+
+  /* =========================================================
+     11. Services — financial overview
+     ========================================================= */
+  function monthData(i) {
+    const inc = FLOW.income[i] * 1000;
+    const exp = FLOW.expense[i] * 1000;
+    const k = exp / 28760;
+    const cats = CAT_NOV.map(v => Math.round(v * k));
+    return { inc, exp, net: inc - exp, rate: (inc - exp) / inc * 100, cats };
+  }
+
+  let highlightCat = null;
+  function renderOverview() {
+    const d = monthData(state.ovIdx);
+    const dt = new Date(2026, state.ovIdx - 1, 1); // FLOW index 11 = November 2026
+    $('#ovMonth').textContent = new Intl.DateTimeFormat(locale(), { month: 'long', year: 'numeric' }).format(dt);
+    setNum($('#ovIncome'), d.inc); $('#ovIncome').dataset.kind = 'money';
+    setNum($('#ovExpense'), d.exp); $('#ovExpense').dataset.kind = 'money';
+    setNum($('#ovNet'), d.net); $('#ovNet').dataset.kind = 'money';
+    setNum($('#ovRate'), d.rate); $('#ovRate').dataset.kind = 'pct';
+    $('#ovPrev').disabled = state.ovIdx <= 0;
+    $('#ovNext').disabled = state.ovIdx >= 11;
+
+    const total = d.cats.reduce((a, b) => a + b, 0);
+    const C = 2 * Math.PI * 80;
+    let offset = 0;
+    const segs = d.cats.map((v, i) => {
+      const len = (v / total) * C;
+      const dimmed = highlightCat !== null && highlightCat !== i;
+      const seg = `<circle cx="100" cy="100" r="80" fill="none" stroke="${CAT_COLORS[i]}" stroke-width="${highlightCat === i ? 26 : 22}"
+                    stroke-dasharray="${Math.max(0, len - 2)} ${C}" stroke-dashoffset="${-offset}" opacity="${dimmed ? .25 : 1}"></circle>`;
+      offset += len;
+      return seg;
+    }).join('');
+    const center = highlightCat === null
+      ? `<small>${esc(t('ov_total'))}</small><b>${money(total)}</b>`
+      : `<small>${esc(t(CAT_KEYS[highlightCat]))}</small><b>${money(d.cats[highlightCat])}</b>`;
+    $('#donut').innerHTML = `<svg viewBox="0 0 200 200" role="img" aria-label="${esc(t('ov_breakdown'))}">${segs}</svg>
+                             <div class="center">${center}</div>`;
+
+    $('#catList').innerHTML = CAT_KEYS.map((k, i) => `
+      <li><button type="button" data-cat="${i}" class="${highlightCat !== null && highlightCat !== i ? 'dim' : ''}" aria-pressed="${highlightCat === i}">
+        <i class="sw" style="background:${CAT_COLORS[i]}"></i>
+        <span>${esc(t(k))}</span>
+        <span class="v num">${money(d.cats[i])} <span class="p">${Math.round(d.cats[i] / total * 100)}%</span></span>
+      </button></li>`).join('');
+  }
+  $('#catList').addEventListener('click', e => {
+    const b = e.target.closest('[data-cat]');
+    if (!b) return;
+    const i = Number(b.dataset.cat);
+    highlightCat = highlightCat === i ? null : i;
+    renderOverview();
+  });
+  $('#ovPrev').addEventListener('click', () => { if (state.ovIdx > 0) { state.ovIdx--; highlightCat = null; renderOverview(); } });
+  $('#ovNext').addEventListener('click', () => { if (state.ovIdx < 11) { state.ovIdx++; highlightCat = null; renderOverview(); } });
+
+  /* =========================================================
+     12. Financial Wellness
+     ========================================================= */
+  const FACTORS = [
+    { k: 'f_savings', v: 80, w: 30 },
+    { k: 'f_bills', v: 100, w: 25 },
+    { k: 'f_budget', v: 56, w: 25 },
+    { k: 'f_fund', v: 45, w: 20 },
+  ];
+  const SCORE = Math.round(FACTORS.reduce((a, f) => a + f.v * f.w / 100, 0));
+  const REC_GO = ['svc-overview', 'svc-overview', 'goals'];
+  const REC_ACT = ['rec_act_overview', 'rec_act_overview', 'rec_act_goal'];
+  const INSIGHTS = [
+    { t: 'ins1_t', d: 'ins1_d', c: 'var(--green)', go: 'svc-overview', act: 'ins_act_overview' },
+    { t: 'ins2_t', d: 'ins2_d', c: 'var(--red)', go: 'svc-overview', act: 'ins_act_shop' },
+    { t: 'ins3_t', d: 'ins3_d', c: 'var(--gold)', go: 'goals', act: 'ins_act_goal' },
+  ];
+
+  function renderWellness() {
+    $('#factorBody').innerHTML = FACTORS.map(f => `<tr><td>${esc(t(f.k))}</td><td class="num">${f.v}%</td><td class="num">${f.w}%</td><td class="num">${(f.v * f.w / 100).toFixed(1)}</td></tr>`).join('') +
+      `<tr class="total"><td><b>${esc(t('wl_total'))}</b></td><td></td><td></td><td class="num"><b>${SCORE}</b></td></tr>`;
+    $('#insights').innerHTML = INSIGHTS.map((x, i) => `
+      <details class="insight" ${i === 0 ? 'open' : ''}>
+        <summary>
+          <span style="display:flex;align-items:center;gap:10px"><i class="tag-dot" style="background:${x.c}"></i>${t(x.t)}</span>
+          <svg class="ico chev" viewBox="0 0 24 24" aria-hidden="true" style="width:18px;height:18px"><use href="#i-right"/></svg>
+        </summary>
+        <p class="body">${t(x.d)}</p>
+        <div class="ins-act"><button class="btn text" type="button" data-go="${x.go}">${t(x.act)}</button></div>
+      </details>`).join('');
+
+    $('#spend').innerHTML = CAT_KEYS.map((k, i) => {
+      const spent = CAT_NOV[i], budget = CAT_BUDGET[i];
+      const pct = Math.min(100, spent / budget * 100);
+      const over = spent > budget;
+      const diff = Math.abs(budget - spent);
+      return `
+        <button class="spend-row" type="button" data-spend="${i}" aria-expanded="false">
+          <div class="top"><span style="color:var(--ink);font-weight:700">${esc(t(k))}</span><span>${money(spent)} / ${money(budget)}</span></div>
+          <div class="bar ${over ? 'warn' : ''}"><i data-w="${pct}" style="width:0"></i></div>
+          <div class="detail ${over ? 'over' : ''}">${over ? t('spend_over', { amt: money(diff) }) : t('spend_under', { amt: money(diff) })}</div>
+        </button>`;
+    }).join('');
+    requestAnimationFrame(() => $$('#spend [data-w]').forEach(el => { el.style.width = el.dataset.w + '%'; }));
+
+    $('#recs').innerHTML = [
+      { t: 'rec1_t', d: 'rec1_d' }, { t: 'rec2_t', d: 'rec2_d' }, { t: 'rec3_t', d: 'rec3_d' },
+    ].map((r, i) => `
+      <article class="rec reveal ${state.recDone[i] ? 'done' : ''}" style="--i:${i}">
+        <span class="n">${i + 1}</span>
+        <h3>${t(r.t)}</h3>
+        <p>${t(r.d)}</p>
+        <button class="btn ${state.recDone[i] ? 'ghost' : 'primary'}" type="button" data-rec="${i}" aria-pressed="${state.recDone[i]}">
+          ${state.recDone[i] ? t('rec_undo') : t('rec_mark')}
+        </button>
+        <button class="btn text" type="button" data-go="${REC_GO[i]}">${t(REC_ACT[i])}</button>
+      </article>`).join('');
+
+    const done = state.recDone.filter(Boolean).length;
+    $('#recPill').textContent = t('rec_count', { n: done, total: state.recDone.length });
+    $('#recBar').style.width = (done / state.recDone.length * 100) + '%';
+  }
+
+  function animateRing() {
+    const C = 2 * Math.PI * 66;
+    const target = C * (1 - SCORE / 100);
+    const ring = $('#ringVal');
+    ring.style.transition = 'none';
+    ring.style.strokeDashoffset = C;
+    void ring.getBoundingClientRect();
+    ring.style.transition = '';
+    requestAnimationFrame(() => { ring.style.strokeDashoffset = target; });
+  }
+
+  $('#spend').addEventListener('click', e => {
+    const b = e.target.closest('[data-spend]');
+    if (!b) return;
+    const open = b.classList.toggle('open');
+    b.setAttribute('aria-expanded', String(open));
+  });
+  $('#recs').addEventListener('click', e => {
+    const b = e.target.closest('[data-rec]');
+    if (!b) return;
+    const i = Number(b.dataset.rec);
+    state.recDone[i] = !state.recDone[i];
+    renderWellness();
+    toast(t('toast_rec'));
+  });
+
+  /* =========================================================
+     13. Contact Us
+     ========================================================= */
+  const cForm = $('#contactForm');
+  const cName = $('#cName'), cEmail = $('#cEmail'), cSubject = $('#cSubject'), cMessage = $('#cMessage');
+  let cTouched = false;
+
+  function validateName() {
+    const ok = cName.value.trim().length >= 2;
+    setErr(cName, $('#errName'), ok ? '' : t('err_name'));
+    return ok;
+  }
+  function validateEmail() {
+    const ok = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(cEmail.value.trim());
+    setErr(cEmail, $('#errEmail'), ok ? '' : t('err_email_c'));
+    return ok;
+  }
+  function validateSubject() {
+    const ok = !!cSubject.value;
+    setErr(cSubject, $('#errSubject'), ok ? '' : t('err_subject'));
+    return ok;
+  }
+  function validateMessage() {
+    const len = cMessage.value.trim().length;
+    const ok = len >= 10 && len <= 500;
+    setErr(cMessage, $('#errMessage'), ok ? '' : t('err_message'));
+    return ok;
+  }
+  function updateMsgCount() {
+    $('#msgCount').textContent = t('chars', { n: cMessage.value.length, max: 500 });
+  }
+
+  cName.addEventListener('blur', () => cTouched && validateName());
+  cEmail.addEventListener('blur', () => cTouched && validateEmail());
+  cSubject.addEventListener('change', () => cTouched && validateSubject());
+  cMessage.addEventListener('blur', () => cTouched && validateMessage());
+  cName.addEventListener('input', () => cTouched && validateName());
+  cEmail.addEventListener('input', () => cTouched && validateEmail());
+  cMessage.addEventListener('input', () => { updateMsgCount(); cTouched && validateMessage(); });
+
+  cForm.addEventListener('submit', e => {
+    e.preventDefault();
+    cTouched = true;
+    const results = [validateName(), validateEmail(), validateSubject(), validateMessage()];
+    if (results.includes(false)) {
+      toast(t('err_generic'));
+      const first = cForm.querySelector('.invalid');
+      first && first.focus();
+      return;
+    }
+    const btn = $('#ctSubmit');
+    btn.disabled = true;
+    btn.innerHTML = `<span class="spin" aria-hidden="true"></span>${esc(t('ct_sending'))}`;
+    setTimeout(() => {
+      btn.disabled = false;
+      btn.textContent = t('ct_send');
+      cForm.hidden = true;
+      const succ = $('#contactSuccess');
+      succ.hidden = false;
+      succ.classList.remove('play'); void succ.offsetWidth; succ.classList.add('play');
+      toast(t('toast_ct'));
+    }, reduceMotion ? 0 : 900);
+  });
+
+  $('#ctAgain').addEventListener('click', () => {
+    cForm.reset();
+    cForm.hidden = false;
+    $('#contactSuccess').hidden = true;
+    cTouched = false;
+    $$('#contactForm .invalid').forEach(el => el.classList.remove('invalid'));
+    $$('#contactForm .err').forEach(el => { el.textContent = ''; el.classList.remove('show'); });
+    updateMsgCount();
+    cName.focus();
+  });
+
+  /* =========================================================
+     14. Render everything (also used after language change)
+     ========================================================= */
+  function renderAll() {
+    renderHome();
+    renderDates();
+    renderSlots();
+    renderApptSummary();
+    updateNotes();
+    renderRequests();
+    renderOverview();
+    renderWellness();
+    renderGoals();
+    updateMsgCount();
+    clampCopies();
+    syncDocEmail();
+    refreshCounters(document);
+    // keep the current year's chart state
+    if (current === 'home') $('#chart').classList.add('grow');
+    // reflect visible-state labels that depend on language
+  }
+
+  /* =========================================================
+     15. Boot
+     ========================================================= */
+  $$('.view h1, #docReview h2').forEach(h => { h.tabIndex = -1; });
+  $('#dateChips').tabIndex = -1;
+  $('#slots').tabIndex = -1;
+  applyStatic();
+  clampCopies();
+  syncDocEmail();
+  updateMsgCount();
+  renderNotifs();
+  renderDates();
+  renderSlots();
+  go(routeFromHash());
+  setTimeout(hideSplash, reduceMotion ? 300 : 1000);
+  renderRequests();
+  renderOverview();
+  renderWellness();
+  renderHome();
+  setTimeout(() => $('#progress').classList.remove('run'), 1000);
+})();
+</script>
+</body>
+</html>

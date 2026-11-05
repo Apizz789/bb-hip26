@@ -1,0 +1,6 @@
+node_modules/
+.visual-out/
+.artifacts/
+.dev/
+dist/*
+!dist/.gitkeep
