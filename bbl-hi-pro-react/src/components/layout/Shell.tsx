@@ -134,7 +134,7 @@ export function AppHeader({ route }: { route: Route }) {
               aria-current={parent === item.route ? 'page' : undefined}>{t(item.key)}</a>
           ))}
           <a href="#playground" data-nav="playground" className={parent === 'playground' ? 'active' : undefined}>
-            <span>{t('nav_playground')}</span><span className="soon-tag">{t('soon')}</span>
+            <span>{t('nav_playground')}</span>
           </a>
         </nav>
 

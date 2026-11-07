@@ -185,9 +185,10 @@ runSuite('p1 (core flows)', async ({ check, step, newPage }) => {
     check('insight action opens the overview', true);
   });
 
-  await step('playground shows its Coming Soon tag', async () => {
+  await step('playground opens the zoo page, with no Coming Soon tag in the nav', async () => {
     await goRoute('playground');
-    check('Playground is marked Coming Soon', (await p.textContent('.main-nav .soon-tag')).trim().length > 0);
+    check('Playground nav has no Coming Soon tag', (await p.locator('.main-nav .soon-tag').count()) === 0);
+    check('the zoo iframe is shown', (await p.locator('iframe.pg-zoo-frame').count()) === 1);
   });
 
   await step('notifications: keyboard Enter marks an item read', async () => {

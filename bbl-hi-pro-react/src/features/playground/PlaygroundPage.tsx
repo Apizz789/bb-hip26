@@ -1,8 +1,7 @@
 import { View } from '../../components/layout/View';
 import { useLang } from '../../app/LanguageProvider';
-import { navigate } from '../../app/router';
 
-/** Financial Playground: Coming Soon placeholder only. Zoo Garden is out of scope for this migration. */
+/** Financial Playground: the 3D zoo (public/zoo/index.html, locked at v10.13), a self-contained page with its own simulated state. */
 export function PlaygroundPage() {
   const { t } = useLang();
   return (
@@ -13,19 +12,8 @@ export function PlaygroundPage() {
           <h1 id="pgTitle" tabIndex={-1}>{t('pg_title')}</h1>
         </div>
       </div>
-      <div className="soon reveal">
-        <svg className="rings" viewBox="0 0 320 320" aria-hidden="true">
-          <circle cx="160" cy="160" r="60" /><circle cx="160" cy="160" r="110" /><circle cx="160" cy="160" r="158" />
-        </svg>
-        <div className="content">
-          <div className="mark">
-            <svg viewBox="0 0 64 64" aria-hidden="true"><use href="#bm-dark" /></svg>
-          </div>
-          <span className="pill blue">{t('pg_soon')}</span>
-          <h2 style={{ marginTop: 14, fontSize: '1.4rem' }}>{t('pg_heading')}</h2>
-          <p>{t('pg_desc')}</p>
-          <button className="btn ghost" type="button" onClick={() => navigate('home')}>{t('pg_back')}</button>
-        </div>
+      <div className="reveal">
+        <iframe className="pg-zoo-frame" src="zoo/index.html" title={t('pg_title')} loading="lazy" />
       </div>
     </View>
   );

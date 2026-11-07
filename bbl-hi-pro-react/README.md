@@ -9,7 +9,7 @@ Phase 1–4 HTML prototype (`preview_p4.html`, kept unchanged).
 - Not a replacement for Mobile Banking.
 - Not connected to any Bangkok Bank API, real customer data, real transactions, or authentication.
 - Not production software. No backend, no security review, no compliance claims.
-- Not the Financial Playground. The Playground page is a "Coming Soon" placeholder only.
+- The Playground page is not connected to the app's goals or mock data. It embeds a separate 3D zoo (`public/zoo/index.html`, locked at v10.13) that keeps its own simulated state.
 
 All data is fictional and marked as mock (`src/data/mock.ts`). Document requests, appointments, and savings
 are simulated in memory and reset on reload.
@@ -19,7 +19,7 @@ Home (overview, cash-flow chart, goal summary, resume card) · Services (hub) ·
 (form → review → confirmation) · Appointment booking (branch, purpose, date, time, confirmation) · Request
 tracking (filters, timeline) · Financial overview (monthly breakdown) · Financial Wellness (score, factors,
 insights, recommendations) · Financial Goals (create, edit, simulated savings) · Contact (form, simulated
-submission) · Playground (Coming Soon) · Brand.
+submission) · Playground (3D zoo) · Brand.
 
 ## Requirements
 - Node.js (the exact version used for this handoff was not recorded; run `node --version` to confirm).

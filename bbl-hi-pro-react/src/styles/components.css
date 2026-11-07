@@ -597,3 +597,6 @@
 
   /* React migration: section sub-headings are h2 for document outline; keep the prototype's h3 size. */
   .h3-look{font-size:1rem}
+
+/* Financial Playground: the 3D zoo page (public/zoo/index.html) in an iframe. */
+.pg-zoo-frame{display:block;width:100%;height:min(82vh,760px);min-height:520px;border:0;border-radius:16px;background:#BFE9FF}

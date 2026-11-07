@@ -58,7 +58,7 @@ Hash router in `src/app/router.ts`. Routes:
 | `#svc-overview` | financial overview (OverviewPage) |
 | `#wellness` | Financial Wellness (wellness) |
 | `#goals` | Financial Goals (goals) |
-| `#playground` | Playground — "Coming Soon" placeholder only |
+| `#playground` | Playground — the 3D zoo in an iframe (`public/zoo/index.html`, locked at v10.13) |
 | `#contact` | contact (contact) |
 | `#brand` | brand page (brand) |
 
