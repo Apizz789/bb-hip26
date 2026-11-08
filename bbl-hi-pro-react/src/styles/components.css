@@ -630,3 +630,33 @@
   .spend-row,.insight{transition:background .2s}
   .spend-row:hover,.insight:hover{background:#FBFBF8}
 }
+
+/* Accounts: picker cards, masked numbers and the eye toggle. */
+.acct-wrap{display:grid;gap:14px}
+.acct-head{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap}
+.acct-head h2{font-size:1.1rem}
+.eye-btn{margin-top:0;display:inline-flex;align-items:center;gap:6px;min-height:40px}
+.acct-row{display:grid;grid-template-columns:1fr;gap:12px}
+@media (min-width:640px){.acct-row{grid-template-columns:repeat(2,1fr)}}
+@media (min-width:960px){.acct-row{grid-template-columns:repeat(4,1fr)}}
+.acct{display:grid;gap:6px;text-align:left;padding:16px;border:1px solid var(--line);border-radius:var(--radius);background:#fff;color:var(--ink);box-shadow:var(--shadow);transition:transform .25s var(--ease),border-color .2s,box-shadow .25s}
+.acct.on{border-color:var(--navy);box-shadow:var(--shadow-hover)}
+.acct-name{font-weight:700;font-size:.9375rem}
+.acct-no{font-size:.8125rem;color:var(--faint);letter-spacing:.04em}
+.acct-bal{font-size:1.25rem;font-weight:800;color:var(--navy)}
+@media (hover:hover) and (prefers-reduced-motion:no-preference){.acct:hover{transform:translateY(-2px)}}
+
+/* Self-assessment */
+.pill-row{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 14px}
+.pill-opt{padding:8px 14px;border-radius:999px;border:1px solid var(--line-2);background:#fff;color:var(--navy);font-weight:600;font-size:.875rem}
+.pill-opt[aria-checked="true"]{background:var(--navy);color:#fff;border-color:var(--navy)}
+.wq-list{list-style:none;padding:0;display:grid;gap:14px}
+.wq-text{margin-bottom:8px}
+.scale{display:flex;flex-wrap:wrap;gap:6px}
+.scale-opt{padding:6px 10px;border-radius:10px;border:1px solid var(--line-2);background:#fff;color:var(--ink);font-size:.8125rem}
+.scale-opt[aria-checked="true"]{background:var(--blue-soft);border-color:var(--blue);color:var(--navy);font-weight:700}
+.wq-result{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:18px;padding-top:14px;border-top:1px solid var(--line)}
+.wq-result span{display:block;font-size:.8125rem;color:var(--faint)}
+.wq-result b{font-size:1.25rem;color:var(--navy)}
+.pdf-box{margin-top:16px;display:grid;gap:6px}
+

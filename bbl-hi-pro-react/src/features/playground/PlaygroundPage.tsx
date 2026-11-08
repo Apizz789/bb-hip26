@@ -20,7 +20,9 @@ function lockScroll(e: SyntheticEvent<HTMLIFrameElement>) {
 
 /** Financial Playground: the 3D zoo (public/zoo/index.html, locked at v10.13) fills the page area. */
 export function PlaygroundPage() {
-  const { t } = useLang();
+  const { t, lang } = useLang();
+  // Thai keeps the locked v10.13 file; English uses the v10.14 translation (same scene, English text).
+  const src = lang === 'en' ? 'zoo/zoo-3d-v10.14-en.html' : 'zoo/index.html';
   return (
     <View route="playground" labelledBy="pgTitle">
       <div className="page-head reveal">
@@ -30,7 +32,7 @@ export function PlaygroundPage() {
         </div>
       </div>
       <div className="reveal">
-        <iframe className="pg-zoo-frame" src="zoo/index.html" title={t('pg_title')} loading="lazy" onLoad={lockScroll} />
+        <iframe className="pg-zoo-frame" src={src} title={t('pg_title')} loading="lazy" onLoad={lockScroll} />
       </div>
     </View>
   );

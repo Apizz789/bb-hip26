@@ -4,6 +4,8 @@ import { addYears, daysBetween, isoOf, parseISO } from '../utils/format';
 
 export interface Goal {
   id: string;
+  /** The account this goal belongs to. */
+  accountId: string;
   /** Set for the built-in mock goals (translated per language). */
   nameKey?: TranslationKey;
   /** Set for user-created goals. */

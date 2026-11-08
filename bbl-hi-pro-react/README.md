@@ -48,7 +48,7 @@ Run from the project root.
 |---|---|---|
 | `npm run build` | Bundle to `dist/` (esbuild, IIFE) | Passes |
 | `npm run dev` | Watch + serve `.dev/` on http://localhost:5173 | Writes only `.dev/`, never `dist/` |
-| `npm run test:unit` | Domain, store, and utility unit tests (node:test + tsx) | 21 / 21 pass |
+| `npm run test:unit` | Domain, store, and utility unit tests (node:test + tsx) | 38 / 38 pass |
 | `npm run test:e2e` | All 12 E2E suites against `dist/index.html` (run build first) | **12 / 12 suites pass, 243 checks, 0 failed.** Exit 0 |
 | `npm run test:visual` | Screenshots of prototype and React at 390/430/768/1000/1440 px, then pixel diff | Heights identical in all 30 pairs. Worst pixel diff 0.05% (threshold 24/255) |
 | `npm run typecheck` | `tsc -p tsconfig.json` with strict settings, including JSX | No errors on macOS, where the React and Node type packages are installed (see MIGRATION_STATUS.md §5) |

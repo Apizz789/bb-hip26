@@ -11,6 +11,7 @@ import { AnimatedNumber } from '../../components/charts/AnimatedNumber';
 import { CATEGORY_BUDGET, CATEGORY_KEYS, CATEGORY_NOV, INSIGHTS, RECOMMENDATIONS, WELLNESS_FACTORS } from '../../data/mock';
 import { computeScore, contribution } from '../../domain/wellness';
 import { money } from '../../utils/format';
+import { SelfAssessment } from './SelfAssessment';
 
 /** Financial Wellness: score and explanation, insights, spending vs budget, recommendations. */
 export function WellnessPage({ active }: { active: boolean }) {
@@ -135,6 +136,7 @@ export function WellnessPage({ active }: { active: boolean }) {
           );
         })}
       </div>
+      <div className="section-block"><SelfAssessment /></div>
       <p className="micro" style={{ textAlign: 'center', marginTop: 24 }}>{t('wl_note')}</p>
     </View>
   );

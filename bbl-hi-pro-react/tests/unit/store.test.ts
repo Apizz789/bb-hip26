@@ -23,3 +23,20 @@ test('saving is capped at the target and still records the goal', () => {
   assert.equal(capped.goals.find(g => g.id === 'g1')?.saved, 60000);
   assert.deepEqual(capped.lastSimulated, { id: 'g1', seq: 1 });
 });
+
+test('choosing an account changes the selection, and the eye toggle hides balances', () => {
+  const picked = reducer(initialState, { type: 'account/select', id: 'a2' });
+  assert.equal(picked.accountId, 'a2');
+  const hidden = reducer(picked, { type: 'balances/toggle' });
+  assert.equal(hidden.hideBalances, true);
+  assert.equal(reducer(hidden, { type: 'balances/toggle' }).hideBalances, false);
+});
+
+test('a new goal is saved to the account that is selected', () => {
+  const picked = reducer(initialState, { type: 'account/select', id: 'a3' });
+  const next = reducer(picked, { type: 'goal/create', input: { name: 'Trip', target: 30000, saved: 0, date: '2027-06-30' } });
+  const added = next.goals[next.goals.length - 1];
+  assert.equal(added.id, 'g7');
+  assert.equal(added.accountId, 'a3');
+});
+
