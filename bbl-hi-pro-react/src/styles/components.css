@@ -38,7 +38,7 @@
   .progress.run{animation:progressRun .7s var(--ease)}
   @keyframes progressRun{0%{width:0;opacity:1}70%{width:85%;opacity:1}100%{width:100%;opacity:0}}
 
-  .app-header{position:sticky;top:0;z-index:40;background:rgba(255,255,255,.92);backdrop-filter:saturate(1.4) blur(10px);
+  .app-header{position:fixed;top:0;left:0;right:0;z-index:40;background:rgba(255,255,255,.92);backdrop-filter:saturate(1.4) blur(10px);
               border-bottom:1px solid var(--line)}
   .header-inner{display:flex;align-items:center;gap:24px;height:72px}
   .wordmark{display:flex;align-items:center;gap:11px;line-height:1.1;min-width:0}
@@ -89,7 +89,7 @@
   .notif-item span{font-size:0.8125rem;color:var(--muted)}
 
   /* Mobile bottom nav */
-  .bottom-nav{display:none;position:fixed;left:0;right:0;bottom:0;z-index:40;background:rgba(255,255,255,.96);backdrop-filter:blur(10px);
+  .bottom-nav{display:none;position:fixed;left:0;right:0;bottom:0;z-index:40;background:#fff;
               border-top:1px solid var(--line);padding:6px 4px calc(6px + env(safe-area-inset-bottom))}
   .bottom-nav a{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 0;font-size:0.75rem;font-weight:600;color:var(--faint);border-radius:12px;transition:color .2s}
   .bottom-nav a.active{color:var(--navy)}
@@ -600,10 +600,12 @@
 /* Financial Playground: the 3D zoo page (public/zoo/index.html) in an iframe. */
 
 /* Footer: pinned to the bottom of the viewport on every page. Content scrolls above it, never under the nav on mobile. */
-:root{--foot-h:56px;--bn-h:0px}
-@media (max-width:959px){:root{--bn-h:76px}}
+:root{--foot-h:56px;--bn-h:0px;--hdr-h:73px}
+body{padding-top:var(--hdr-h)}
+@media (max-width:959px){:root{--bn-h:calc(69px + env(safe-area-inset-bottom, 0px))}}
+@media (max-width:719px){:root{--hdr-h:65px;--foot-h:96px}}
 #app{padding-bottom:calc(var(--foot-h) + var(--bn-h) + 24px)}
-.site-foot{position:fixed;left:0;right:0;bottom:var(--bn-h);z-index:30;background:rgba(246,245,240,.96);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);border-top:1px solid var(--line);font-size:0.8125rem;color:var(--faint)}
+.site-foot{position:fixed;left:0;right:0;bottom:var(--bn-h);z-index:30;background:#F6F5F0;border-top:1px solid var(--line);font-size:0.8125rem;color:var(--faint)}
 .site-foot-in{display:flex;justify-content:space-between;align-items:center;gap:6px 12px;flex-wrap:wrap;min-height:var(--foot-h);padding-top:8px;padding-bottom:8px}
 .site-foot nav{display:flex;gap:16px}
 .site-foot a:hover{color:var(--navy);text-decoration:underline}
@@ -662,3 +664,7 @@
 .wq-result b{font-size:1.25rem;color:var(--navy)}
 .pdf-box{margin-top:16px;display:grid;gap:6px}
 
+
+/* Phones and tablets: the fixed header and the bottom bars are solid (no blur), so they do not lag or show content through them. */
+@media (max-width:959px){.app-header{background:#fff;backdrop-filter:none;-webkit-backdrop-filter:none}}
+html{overscroll-behavior-y:none}

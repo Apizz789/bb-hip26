@@ -54,6 +54,8 @@
   .walkpad button:active{background:#FFD166}
   .walk-note{position:absolute;left:50%;bottom:46px;transform:translateX(-50%);margin:0;background:rgba(30,90,168,.9);color:#fff;font-weight:700;font-size:.82rem;border-radius:999px;padding:6px 12px;white-space:nowrap;max-width:92%;overflow:hidden;text-overflow:ellipsis}
   .walk-note:empty{display:none}
+  .walk-jump{position:absolute;right:12px;bottom:46px;pointer-events:auto;width:72px;height:72px;border:0;border-radius:50%;background:rgba(255,209,102,.95);color:var(--ink);font:inherit;font-size:.82rem;font-weight:800;line-height:1.1;touch-action:none;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.2)}
+  .walk-jump:active{transform:scale(.95)}
   @keyframes foodfly{0%{transform:translate(-50%,0) scale(.6);opacity:0}15%{opacity:1}100%{transform:translate(-50%,-140px) scale(1.2);opacity:0}}
   .infocard{position:absolute;right:10px;top:120px;left:auto;width:min(330px,calc(100% - 20px));background:#fff;border-radius:16px;padding:14px 14px 12px;box-shadow:0 8px 24px rgba(20,40,70,.18);border:1px solid var(--line);max-height:calc(100% - 172px);overflow:auto;z-index:2}
   .infocard[hidden]{display:none}
@@ -297,6 +299,7 @@
             <div class="look"><button type="button" id="k-lookup" aria-label="Look up">Up</button><button type="button" id="k-lookdown" aria-label="Look down">Down</button></div>
           </div>
         </div>
+        <button type="button" class="walk-jump" id="k-jump" aria-label="Jump (Space)">Jump</button>
         <p class="walk-note" id="walk-note" aria-live="polite"></p>
       </div>
       <span class="hint">Drag to rotate · Tap an animal to view it</span>
@@ -1280,7 +1283,7 @@ function resetKeeper(kp, rng) {
 // every zone gets its polygon, gate and obstacles once, at load
 for (const a of CONFIG.areas) prepareArea(a, CONFIG);
 // ---- the keeper on foot: movement and camera maths (pure) ----
-const WALK = { speed: 3.2, run: 5.4, back: 0.6, turn: 2.4, bound: 92, feedRange: 5, eyeHeight: 1.62, thirdDist: 6.4, thirdUp: 3.4, lookHeight: 1.25, dragTurn: 0.009, dragLook: 0.006, lookSpeed: 1.2, pitchMin: -0.9, pitchMax: 1.2 };   // dragTurn: radians per pixel of drag
+const WALK = { speed: 3.2, run: 5.4, back: 0.6, turn: 2.4, bound: 92, feedRange: 5, eyeHeight: 1.62, thirdDist: 6.4, thirdUp: 3.4, lookHeight: 1.25, dragTurn: 0.009, dragLook: 0.006, lookSpeed: 1.2, pitchMin: -0.9, pitchMax: 1.2, jumpSpeed: 4.2, gravity: 11 };   // dragTurn: radians per pixel of drag
 // one step: turn (left/right), walk or run forward, walk back slowly. If the way is blocked it slides along the wall.
 // blocked(x, z) says where the keeper may not stand; bound is the radius of the map.
 function stepWalker(w, input, dt, blocked, bound = WALK.bound) {
@@ -1633,6 +1636,42 @@ function faceDecal(sex, y = 1.62) {
   m.position.set(0, y, 0);
   return m;
 }
+/* ---- the company logo above the fountain: a 3D model of the mark (extruded from its outline). It turns once every 9 s and glows at night ---- */
+const LOGO = { spin: null, light: null, omega: Math.PI * 2 / 9, baseY: 4.7 };   // baseY: the middle of the bob (its lowest point stays above the jet)
+// the mark's outline in a 388 x 513 box (y down): the outer drop, and three openings inside it (the top diamond and the two leaves)
+const LOGO_PATHS = {
+  outer: [['M', 194, 0], ['C', 262, 92, 388, 226, 388, 322], ['C', 388, 430, 302, 513, 194, 513], ['C', 86, 513, 0, 430, 0, 322], ['C', 0, 226, 126, 92, 194, 0]],
+  top:   [['M', 194, 62], ['C', 232, 104, 300, 172, 300, 214], ['C', 300, 246, 246, 302, 194, 362], ['C', 142, 302, 88, 246, 88, 214], ['C', 88, 172, 156, 104, 194, 62]],
+  left:  [['M', 52, 258], ['C', 100, 304, 142, 342, 166, 374], ['L', 168, 448], ['C', 104, 420, 58, 352, 52, 258]],
+  right: [['M', 336, 258], ['C', 288, 304, 246, 342, 222, 374], ['L', 220, 448], ['C', 284, 420, 330, 352, 336, 258]]
+};
+function buildLogo(lampList) {
+  const W = 388, H = 513, S = 1.5 / H;                 // the mark is 1.5 m tall
+  const X = x => (x - W / 2) * S, Y = y => (H - y) * S;
+  const draw = (p, cmds) => {
+    for (const c of cmds) {
+      if (c[0] === 'M') p.moveTo(X(c[1]), Y(c[2]));
+      else if (c[0] === 'L') p.lineTo(X(c[1]), Y(c[2]));
+      else p.bezierCurveTo(X(c[1]), Y(c[2]), X(c[3]), Y(c[4]), X(c[5]), Y(c[6]));
+    }
+    return p;
+  };
+  const shape = draw(new THREE.Shape(), LOGO_PATHS.outer);
+  for (const k of ['top', 'left', 'right']) shape.holes.push(draw(new THREE.Path(), LOGO_PATHS[k]));
+  const geo = new THREE.ExtrudeGeometry(shape, { depth: 0.2, bevelEnabled: true, bevelThickness: 0.04, bevelSize: 0.03, bevelSegments: 3, curveSegments: 24 });
+  geo.center();
+  // in the lamp list: it glows at night with the bulbs (applySky sets its emissive from the night level)
+  const mat = new THREE.MeshStandardMaterial({ color: '#0066FF', emissive: '#0066FF', emissiveIntensity: 0, roughness: 0.35, metalness: 0.1 });
+  lampList.push(mat);
+  const group = new THREE.Group();
+  group.position.set(0, LOGO.baseY, 0);                // above the tall centre jet (its top is about 3.3 m)
+  group.add(new THREE.Mesh(geo, mat));
+  scene.add(group);
+  const light = new THREE.PointLight('#5AA9FF', 0, 9, 2);
+  light.position.set(0, LOGO.baseY, 1.4);
+  scene.add(light);
+  LOGO.spin = group; LOGO.light = light;
+}
 /* ---- the central fountain: a three-tier basin, jets that always play, and bulbs and water that glow at night ---- */
 const FOUNTAIN_R = 3.0;                             // the basin's outer edge: walkers keep out of it
 const JET_G = 9.8;
@@ -1656,6 +1695,7 @@ function buildFountain(lampList) {
   // bulbs round the outer wall and the middle tier (they glow at night only, through the shared lamp rule)
   for (let i = 0; i < 10; i++) { const a = (i / 10) * TAU + 0.2; const b = new THREE.Mesh(sph(0.08, 10, 8), bulbMat); b.position.set(Math.cos(a) * 3.05, 0.22, Math.sin(a) * 3.05); scene.add(b); }
   for (let i = 0; i < 6; i++) { const a = (i / 6) * TAU; const b = new THREE.Mesh(sph(0.08, 10, 8), bulbMat); b.position.set(Math.cos(a) * 1.95, 0.75, Math.sin(a) * 1.95); scene.add(b); }
+  buildLogo(lampList);
   // jets: each emitter throws particles on a ballistic arc (g = 9.8), and a particle is hidden once it has landed
   const JET = [];
   const ring = (n, r, y, vh, vy, rate, off) => {
@@ -2957,6 +2997,7 @@ function applySky(s, cover = 0, rain = 0) {
   moonGlow.material.opacity = 0.12 * s.night * (1 - cover);
   stars.material.opacity = s.starAlpha * 0.9 * (1 - cover);
   world.lamps.forEach(l => { l.emissiveIntensity = s.night * 1.1; });
+  if (LOGO.light) LOGO.light.intensity = s.night * 10;
   (world.carLamps || []).forEach(l => { l.emissiveIntensity = s.night * 0.5; });   // v10.11: low headlights
   SIGN_LIGHTS.forEach(l => { l.emissiveIntensity = s.night * 1.2; });              // v10.11: ribbons on the signs
   SIGN_FACES.forEach(l => { l.emissiveIntensity = s.night * 0.9; });               // v10.12: the lettering glows at night
@@ -4282,7 +4323,7 @@ setCollOpen(false);
 /* ---- the keeper on foot: walk round the park with WASD or the arrow keys (or the on-screen pad). Fences can only be crossed
    at the gates; houses, trees and the fountain block the way; the keeper stays inside the map. Feeding on foot is the normal
    feeding (one food), and only animals of the keeper's own zone within reach can be fed. ---- */
-const WALKER = { on: false, sex: 'm', x: 0, z: 4.8, heading: 0, moving: 0, phase: 0, k: 0, feedT: 0, view: 'third', pitch: 0, human: null };
+const WALKER = { on: false, sex: 'm', x: 0, z: 4.8, heading: 0, moving: 0, phase: 0, k: 0, feedT: 0, view: 'third', pitch: 0, y: 0, vy: 0, jumpReq: false, human: null };
 const KEYS = { left: false, right: false, fwd: false, back: false, run: false, lookUp: false, lookDown: false };
 function walkerBlocked(x, z) {
   if (Math.hypot(x, z) < FOUNTAIN_R + 0.25) return true;                 // the fountain's basin
@@ -4357,6 +4398,7 @@ function setWalkView(v) {
 }
 function setWalker(on) {
   WALKER.on = on;
+  WALKER.y = 0; WALKER.vy = 0; WALKER.jumpReq = false;
   stage.classList.toggle('walking', on);
   $('walk-top').hidden = on;
   for (const k of Object.keys(KEYS)) KEYS[k] = false;
@@ -4381,14 +4423,23 @@ function setWalker(on) {
   }
 }
 function walkerFrame(dt) {
+  // jump: a press (Space or the jump button) starts a jump only from the ground; gravity brings the walker back down
+  if (WALKER.jumpReq && WALKER.y <= 0) WALKER.vy = WALK.jumpSpeed;
+  WALKER.jumpReq = false;
+  if (WALKER.y > 0 || WALKER.vy > 0) {
+    WALKER.vy -= WALK.gravity * dt;
+    WALKER.y += WALKER.vy * dt;
+    if (WALKER.y <= 0) { WALKER.y = 0; WALKER.vy = 0; }
+  }
   const n = stepWalker(WALKER, KEYS, dt, walkerBlocked);
   WALKER.x = n.x; WALKER.z = n.z; WALKER.heading = n.heading; WALKER.moving = n.dir;
   WALKER.pitch = clampPitch(WALKER.pitch + ((KEYS.lookUp ? 1 : 0) - (KEYS.lookDown ? 1 : 0)) * WALK.lookSpeed * dt);
   updateHuman(WALKER.human, WALKER, dt, time);
+  WALKER.human.root.position.y += WALKER.y;
   WALKER.human.root.visible = WALKER.view === 'third';
   const c = walkerCamera(WALKER.x, WALKER.z, WALKER.heading, WALKER.view, WALKER.pitch);
-  camera.position.set(c.cx, c.cy, c.cz);
-  camera.lookAt(c.lx, c.ly, c.lz);
+  camera.position.set(c.cx, c.cy + WALKER.y, c.cz);
+  camera.lookAt(c.lx, c.ly + WALKER.y, c.lz);
 }
 // feed the nearest unlocked animal of the keeper's own zone within reach (one food, the same as the info card)
 function walkerFeed() {
@@ -4418,13 +4469,14 @@ function typingIn(e) {
 }
 document.addEventListener('keydown', e => {
   if (!WALKER.on || typingIn(e)) return;
+  if (e.code === 'Space') { if (!e.repeat) WALKER.jumpReq = true; e.preventDefault(); return; }
   const k = WALK_KEYS[e.code];
   if (k) { KEYS[k] = true; e.preventDefault(); return; }
   if (e.code === 'KeyE') { walkerFeed(); e.preventDefault(); }
   else if (e.code === 'KeyV') setWalkView(WALKER.view === 'third' ? 'first' : 'third');
   else if (e.key === 'Escape') setWalker(false);
 });
-document.addEventListener('keyup', e => { const k = WALK_KEYS[e.code]; if (k) KEYS[k] = false; });
+document.addEventListener('keyup', e => { if (e.code === 'Space' && WALKER.on) e.preventDefault(); const k = WALK_KEYS[e.code]; if (k) KEYS[k] = false; });
 window.addEventListener('blur', () => { for (const k of Object.keys(KEYS)) KEYS[k] = false; });
 // the on-screen pad (touch and mouse): hold to walk or turn
 for (const [id, k] of [['k-left', 'left'], ['k-right', 'right'], ['k-fwd', 'fwd'], ['k-back', 'back'], ['k-lookup', 'lookUp'], ['k-lookdown', 'lookDown']]) {
@@ -4433,6 +4485,7 @@ for (const [id, k] of [['k-left', 'left'], ['k-right', 'right'], ['k-fwd', 'fwd'
   for (const ev of ['pointerup', 'pointerleave', 'pointercancel']) b.addEventListener(ev, () => { KEYS[k] = false; });
 }
 window.addEventListener('pointerup', () => { for (const k of Object.keys(KEYS)) KEYS[k] = false; });
+$('k-jump').addEventListener('pointerdown', e => { WALKER.jumpReq = true; e.preventDefault(); });
 $('walkbtn').addEventListener('click', () => setWalker(!WALKER.on));
 $('walk-top').addEventListener('click', () => setWalker(true));
 $('walk-exit').addEventListener('click', () => setWalker(false));
@@ -4758,6 +4811,11 @@ renderer.setAnimationLoop(() => {
   });
   updateBursts(dt);
   world.fountain.update(dt);                 // the fountain plays all the time, day and night
+  if (LOGO.spin && !REDUCED) {
+    LOGO.spin.rotation.y = time * LOGO.omega;                         // one full turn every 9 s
+    LOGO.spin.position.y = LOGO.baseY + Math.sin(time * 2.4) * 0.3;   // bobs up and down
+    LOGO.light.position.y = LOGO.spin.position.y;
+  }
   updateTownCars(dt);
   updateTrains(dt);
   syncLightBtn();
