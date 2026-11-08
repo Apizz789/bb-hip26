@@ -668,3 +668,12 @@ body{padding-top:var(--hdr-h)}
 /* Phones and tablets: the fixed header and the bottom bars are solid (no blur), so they do not lag or show content through them. */
 @media (max-width:959px){.app-header{background:#fff;backdrop-filter:none;-webkit-backdrop-filter:none}}
 html{overscroll-behavior-y:none}
+
+/* Financial Playground: the zoo covers the whole screen while its full-screen mode is on (phones too). The reveal animation is switched off so it cannot become the frame's containing block. */
+.pg-zoo-frame.is-fs{position:fixed;inset:0;margin:0;width:100vw!important;height:100vh!important;height:100dvh!important;min-height:0!important;max-height:none;border-radius:0;z-index:90}
+.reveal:has(> .pg-zoo-frame.is-fs){animation:none}
+
+/* Header tools (language switch, bell) stay on the right edge on phones and tablets, where the main menu is hidden */
+@media (max-width:959px){.header-tools{margin-left:auto}}
+/* Footer: "Contact Us" stays on the right edge at every width (the brand-identity link stays at the left of its group) */
+.site-foot nav{flex:1 1 auto;justify-content:space-between}

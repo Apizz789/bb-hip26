@@ -173,7 +173,7 @@
   .zzz span:nth-child(2){font-size:18px;left:6px;animation-delay:.9s}
   .zzz span:nth-child(3){font-size:22px;left:12px;animation-delay:1.8s}
   @keyframes zfloat{0%{transform:translate(0,0);opacity:0}15%{opacity:1}100%{transform:translate(16px,-40px);opacity:0}}
-  .lvlpop{position:absolute;left:50%;top:38%;z-index:5;max-width:86%;background:#fff;border-radius:18px;padding:12px 18px;text-align:center;box-shadow:0 10px 28px rgba(20,40,70,.25);pointer-events:none;transform:translate(-50%,-50%);animation:lvlpop 2.6s ease both}
+  .lvlpop{position:absolute;left:50%;top:50%;z-index:5;max-width:86%;background:#fff;border-radius:18px;padding:12px 18px;text-align:center;box-shadow:0 10px 28px rgba(20,40,70,.25);pointer-events:none;transform:translate(-50%,-50%);animation:lvlpop 2.6s ease both}
   .lp-big{font-size:2.2rem;line-height:1.1;font-family:"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif}
   .lp-t{font-size:1rem;font-weight:800;color:var(--ink);margin-top:2px}
   .lp-s{font-size:.82rem;font-weight:700;color:var(--muted);margin-top:2px}
@@ -4124,6 +4124,7 @@ function levelPop(id, level, stageUp) {
   el.append(big, t1, t2);
   $('stage').appendChild(el);
   setTimeout(() => el.remove(), 2600);
+  try { parent.postMessage({ type: 'bbl-zoo-popup' }, '*'); } catch (e) {}   // the page scrolls the frame so this popup sits in the middle of the screen
   sparkleAt(id);
 }
 $('feed').addEventListener('click', () => {
@@ -4674,11 +4675,14 @@ $('live').setAttribute('aria-pressed', String(liveClock));
 /* ---- fullscreen: native API first; a CSS fallback covers browsers (iPhone) that refuse it ---- */
 let fsFallback = false;
 const fsBtn = $('fsbtn');
+// tell the page around the zoo when its full-screen fallback turns on or off, so the frame can cover the whole screen
+function postFs() { try { parent.postMessage({ type: 'bbl-zoo-fs', on: fsFallback }, '*'); } catch (e) {} }
 function syncFs() {
   const on = !!document.fullscreenElement || fsFallback;
   fsBtn.textContent = on ? '✕ Exit fullscreen' : '⛶ Fullscreen';
   fsBtn.setAttribute('aria-pressed', String(on));
   stage.classList.toggle('fs', fsFallback);
+  postFs();
   resize();
 }
 async function toggleFs() {

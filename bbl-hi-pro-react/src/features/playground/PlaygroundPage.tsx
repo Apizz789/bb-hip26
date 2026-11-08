@@ -1,4 +1,4 @@
-import { useEffect, useRef, type SyntheticEvent } from 'react';
+import { useEffect, useRef, useState, type SyntheticEvent } from 'react';
 import { View } from '../../components/layout/View';
 import { useLang } from '../../app/LanguageProvider';
 
@@ -65,6 +65,24 @@ function attachFrame(frame: HTMLIFrameElement): Detach {
 export function PlaygroundPage() {
   const { t, lang } = useLang();
   const detach = useRef<Detach | null>(null);
+  const frameRef = useRef<HTMLIFrameElement>(null);
+  const [fullScreen, setFullScreen] = useState(false);
+  // The zoo reports its full-screen mode (the frame then covers the whole screen) and its popups (the frame scrolls so the popup sits in the middle of the screen).
+  useEffect(() => {
+    const onMessage = (e: MessageEvent) => {
+      const frame = frameRef.current;
+      if (!frame || e.source !== frame.contentWindow) return;
+      const data = e.data as { type?: unknown; on?: unknown } | null;
+      if (data?.type === 'bbl-zoo-fs') setFullScreen(data.on === true);
+      if (data?.type === 'bbl-zoo-popup') {
+        const r = frame.getBoundingClientRect();
+        const offset = r.top + r.height / 2 - window.innerHeight / 2;
+        if (Math.abs(offset) > window.innerHeight * 0.15) window.scrollBy({ top: offset, behavior: 'smooth' });
+      }
+    };
+    window.addEventListener('message', onMessage);
+    return () => window.removeEventListener('message', onMessage);
+  }, []);
   useEffect(() => () => {
     detach.current?.();
     detach.current = null;
@@ -84,7 +102,7 @@ export function PlaygroundPage() {
         </div>
       </div>
       <div className="reveal">
-        <iframe className="pg-zoo-frame" src={src} title={t('pg_title')} loading="lazy" onLoad={onLoad} />
+        <iframe ref={frameRef} className={'pg-zoo-frame' + (fullScreen ? ' is-fs' : '')} src={src} title={t('pg_title')} loading="lazy" onLoad={onLoad} allowFullScreen />
       </div>
     </View>
   );
