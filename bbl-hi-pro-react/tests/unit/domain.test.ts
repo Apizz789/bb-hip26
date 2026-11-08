@@ -10,7 +10,7 @@ import { advance, isFinal, pillTone, formatRef, matchesFilter } from '../../src/
 import { money, money2, fmtDate, isoOf, fill } from '../../src/utils/format';
 import { TODAY, WELLNESS_FACTORS, FLOW, CATEGORY_NOV, INITIAL_GOALS } from '../../src/data/mock';
 
-const g = (over: Partial<Goal> = {}): Goal => ({ id: 'x', target: 60000, saved: 18500, start: '2026-06-01', date: '2027-03-31', ...over });
+const g = (over: Partial<Goal> = {}): Goal => ({ id: 'x', accountId: 'a1', target: 60000, saved: 18500, start: '2026-06-01', date: '2027-03-31', ...over });
 
 test('goal status matches the prototype rules for the mock goals', () => {
   assert.equal(goalStatus(INITIAL_GOALS[0], TODAY), 'behind');   // Japan trip

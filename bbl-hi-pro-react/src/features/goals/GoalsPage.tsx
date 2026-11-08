@@ -12,6 +12,7 @@ import { useGoalBump } from './useGoalBump';
 import { goalName } from './goalText';
 import type { TranslationKey } from '../../i18n/dictionary';
 import { GoalDialog } from './GoalDialog';
+import { AccountCards } from '../accounts/AccountCards';
 
 const ST_CLASS: Record<GoalStatus, string> = { done: 'st-done', ontrack: 'st-ontrack', behind: 'st-behind', overdue: 'st-overdue' };
 const ST_KEY: Record<GoalStatus, TranslationKey> = {
@@ -27,8 +28,9 @@ export function GoalsPage() {
   const simulate = useSimulateSave();
   const [dialog, setDialog] = useState<Goal | 'new' | null>(null);
 
-  const doneCount = state.goals.filter(g => goalStatus(g, TODAY) === 'done').length;
-  const totalSaved = state.goals.reduce((sum, g) => sum + g.saved, 0);
+  const goals = state.goals.filter(g => g.accountId === state.accountId);
+  const doneCount = goals.filter(g => goalStatus(g, TODAY) === 'done').length;
+  const totalSaved = goals.reduce((sum, g) => sum + g.saved, 0);
 
   return (
     <View route="goals" labelledBy="goalsTitle">
@@ -41,15 +43,19 @@ export function GoalsPage() {
         <p>{t('goals_sub')}</p>
       </PageHead>
 
+      <section className="section-block reveal">
+        <AccountCards />
+      </section>
+
       <div className="kpis goal-kpis reveal">
-        <div className="card kpi"><span>{t('goals_total')}</span><strong className="count" id="gkCount"><AnimatedNumber value={state.goals.length} kind="int" /></strong></div>
+        <div className="card kpi"><span>{t('goals_total')}</span><strong className="count" id="gkCount"><AnimatedNumber value={goals.length} kind="int" /></strong></div>
         <div className="card kpi"><span>{t('goals_saved')}</span><strong className="count" id="gkSaved"><AnimatedNumber value={totalSaved} kind="baht" /></strong></div>
         <div className="card kpi"><span>{t('goals_done')}</span><strong className="count" id="gkDone"><AnimatedNumber value={doneCount} kind="int" /></strong></div>
       </div>
 
-      {state.goals.length > 0 ? (
+      {goals.length > 0 ? (
         <div className="goal-grid" id="goalList">
-          {state.goals.map(g => (
+          {goals.map(g => (
             <GoalCard key={g.id} goal={g} lang={lang} onEdit={() => setDialog(g)} onSimulate={amount => simulate(g.id, amount)} />
           ))}
         </div>

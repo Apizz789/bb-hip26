@@ -4,6 +4,7 @@ import type { TranslationKey } from '../i18n/dictionary';
 import type { Goal } from '../domain/goals';
 import type { TrackedRequest } from '../domain/requests';
 import type { WellnessFactor } from '../domain/wellness';
+import type { Account } from '../domain/accounts';
 
 /** Reference date for every mock calculation (2026-11-05). */
 export const TODAY = new Date(2026, 10, 5);
@@ -20,10 +21,21 @@ export const CATEGORY_COLORS = ['#0D2B5E', '#1F5BBD', '#C9963A', '#1E8A63', '#8A
 export const CATEGORY_NOV = [8450, 2640, 6320, 6980, 4370] as const;
 export const CATEGORY_BUDGET = [9000, 3000, 6500, 5000, 4500] as const;
 
+/** Four fictional accounts. The first keeps the figures the prototype has always shown. */
+export const ACCOUNTS: Account[] = [
+  { id: 'a1', name: { th: 'บัญชีเงินเดือน', en: 'Salary account' }, tail: '123', balance: 152430.5, income: 45000, expense: 28760 },
+  { id: 'a2', name: { th: 'บัญชีออมเพื่อการศึกษา', en: 'Education savings' }, tail: '457', balance: 84250, income: 12000, expense: 3450 },
+  { id: 'a3', name: { th: 'บัญชีใช้จ่ายรายวัน', en: 'Everyday account' }, tail: '908', balance: 18904.2, income: 9500, expense: 7820 },
+  { id: 'a4', name: { th: 'บัญชีเผื่อฉุกเฉิน', en: 'Emergency account' }, tail: '246', balance: 42600, income: 1200, expense: 0 },
+];
+
 export const INITIAL_GOALS: Goal[] = [
-  { id: 'g1', nameKey: 'g_japan', target: 60000, saved: 18500, start: '2026-06-01', date: '2027-03-31' },
-  { id: 'g2', nameKey: 'g_fund', target: 90000, saved: 45000, start: '2026-03-01', date: '2027-06-30' },
-  { id: 'g3', nameKey: 'g_laptop', target: 35000, saved: 35000, start: '2026-08-01', date: '2026-12-31' },
+  { id: 'g1', accountId: 'a1', nameKey: 'g_japan', target: 60000, saved: 18500, start: '2026-06-01', date: '2027-03-31' },
+  { id: 'g2', accountId: 'a1', nameKey: 'g_fund', target: 90000, saved: 45000, start: '2026-03-01', date: '2027-06-30' },
+  { id: 'g3', accountId: 'a1', nameKey: 'g_laptop', target: 35000, saved: 35000, start: '2026-08-01', date: '2026-12-31' },
+  { id: 'g4', accountId: 'a2', nameKey: 'g_japan', target: 30000, saved: 12000, start: '2026-07-01', date: '2027-08-31' },
+  { id: 'g5', accountId: 'a3', nameKey: 'g_fund', target: 20000, saved: 6500, start: '2026-05-01', date: '2027-04-30' },
+  { id: 'g6', accountId: 'a4', nameKey: 'g_laptop', target: 15000, saved: 3000, start: '2026-09-01', date: '2027-02-28' },
 ];
 
 export const INITIAL_REQUESTS: TrackedRequest[] = [

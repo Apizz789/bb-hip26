@@ -19,13 +19,17 @@ export interface AppState {
   ovIndex: number;
   apptDate: number | null;
   apptTime: string | null;
+  /** Account the home and goals pages focus on. */
+  accountId: string;
+  /** Eye toggle: hide balances on the home page and in the account picker. */
+  hideBalances: boolean;
   /** Last goal that received a simulated save. `seq` increases on every save so the highlight can replay. */
   lastSimulated: { id: string; seq: number } | null;
 }
 
 export const initialState: AppState = {
   goals: INITIAL_GOALS,
-  goalSeq: 3,
+  goalSeq: 6,
   requests: INITIAL_REQUESTS,
   reqSeq: 40500,
   notifications: INITIAL_NOTIFICATIONS,
@@ -37,6 +41,8 @@ export const initialState: AppState = {
   apptDate: null,
   apptTime: null,
   lastSimulated: null,
+  accountId: 'a1',
+  hideBalances: false,
 };
 
 export type Action =
@@ -53,7 +59,9 @@ export type Action =
   | { type: 'range/set'; range: 6 | 12 }
   | { type: 'overview/set'; index: number }
   | { type: 'appt/date'; index: number | null }
-  | { type: 'appt/time'; time: string | null };
+  | { type: 'appt/time'; time: string | null }
+  | { type: 'account/select'; id: string }
+  | { type: 'balances/toggle' };
 
 export function reducer(state: AppState, action: Action): AppState {
   switch (action.type) {
@@ -77,6 +85,7 @@ export function reducer(state: AppState, action: Action): AppState {
         saved: action.input.saved,
         start: isoOf(TODAY),
         date: action.input.date,
+        accountId: state.accountId,
       };
       return { ...state, goals: [...state.goals, goal], goalSeq: state.goalSeq + 1 };
     }
@@ -135,6 +144,10 @@ export function reducer(state: AppState, action: Action): AppState {
       return { ...state, apptDate: action.index, apptTime: null };
     case 'appt/time':
       return { ...state, apptTime: action.time };
+    case 'account/select':
+      return { ...state, accountId: action.id };
+    case 'balances/toggle':
+      return { ...state, hideBalances: !state.hideBalances };
   }
 }
 

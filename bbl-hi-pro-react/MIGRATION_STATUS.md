@@ -86,7 +86,7 @@ Files changed: `src/app/router.ts`, `src/app/App.tsx`, `src/components/layout/Sh
 | **Scroll to top happens when the page is ready**, not when navigation starts. | Makes the focus and scroll position deterministic. The page is not scrolled under the skeleton. | Move the `window.scrollTo` call back into the navigation effect |
 | **Unknown hash** falls back to Home but stays in the URL. | Hash router has no 404 page. | Known; see §7 |
 
-Behaviour covered by E2E checks against the React build (these checks encode the prototype's behaviour; they are not a side-by-side run of the prototype): language switch and persistence, document request, appointment booking, request tracking, goal create/edit/save, wellness accordion, overview controls, contact form, notifications, and the Playground Coming Soon state.
+Behaviour covered by E2E checks against the React build (these checks encode the prototype's behaviour; they are not a side-by-side run of the prototype): language switch and persistence, document request, appointment booking, request tracking, goal create/edit/save, wellness accordion, overview controls, contact form, notifications, and the Playground zoo iframe.
 
 ## 4. Snapshots and integrity
 

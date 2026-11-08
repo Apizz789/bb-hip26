@@ -4,6 +4,9 @@ import { useFeedback } from '../../app/FeedbackProvider';
 import { Dialog } from '../../components/feedback/Dialog';
 import { isFinal, STEP_KEYS, type TrackedRequest } from '../../domain/requests';
 import { requestMeta } from './requestText';
+import { downloadSamplePdf } from './samplePdf';
+import { tx } from '../../i18n/extra';
+import { fmtDate } from '../../utils/format';
 
 /** Request details with a status timeline. "Next status" is a simulated update only. */
 export function RequestDialog({ requestId, onClose }: { requestId: string; onClose: () => void }) {
@@ -47,6 +50,15 @@ export function RequestDialog({ requestId, onClose }: { requestId: string; onClo
           );
         })}
       </ul>
+      {req.type === 'doc' && done && (
+        <div className="pdf-box">
+          <button className="btn primary full" type="button"
+            onClick={() => void downloadSamplePdf({ ref: req.ref, title: t(req.titleKey), date: fmtDate(req.date, lang), lang })}>
+            {tx(lang, 'pdf_btn')}
+          </button>
+          <p className="micro">{tx(lang, 'pdf_note')}</p>
+        </div>
+      )}
     </Dialog>
   );
 }

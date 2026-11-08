@@ -9,7 +9,9 @@ import { CashFlowChart } from '../../components/charts/CashFlowChart';
 import { Icon } from '../../components/icons/Icon';
 import { goalRatio, goalRemaining } from '../../domain/goals';
 import { STEP_KEYS } from '../../domain/requests';
-import { FLOW } from '../../data/mock';
+import { ACCOUNTS, FLOW } from '../../data/mock';
+import { netOf, savingsRateOf } from '../../domain/accounts';
+import { AccountCards } from '../accounts/AccountCards';
 import { resumeRequest } from '../../store/appState';
 import { money, money2, fmtDate } from '../../utils/format';
 import { goalName } from '../goals/goalText';
@@ -33,10 +35,11 @@ export function HomePage({ active }: { active: boolean }) {
   const hour = new Date().getHours();
   const period: DayPeriod = hour < 12 ? 'morning' : hour < 17 ? 'afternoon' : 'evening';
   const resume = resumeRequest(state);
-  const goal = state.goals[0];
-  const goalCardRef = useGoalBump(goal.id);
-  const remain = goalRemaining(goal);
-  const pct = goalRatio(goal) * 100;
+  const account = ACCOUNTS.find(a => a.id === state.accountId) ?? ACCOUNTS[0];
+  const goal = state.goals.find(g => g.accountId === account.id);
+  const goalCardRef = useGoalBump(goal?.id ?? '');
+  const remain = goal ? goalRemaining(goal) : 0;
+  const pct = goal ? goalRatio(goal) * 100 : 0;
 
   return (
     <View route="home" labelledBy="homeTitle">
@@ -55,10 +58,16 @@ export function HomePage({ active }: { active: boolean }) {
         </div>
         <div className="hero-balance">
           <span className="label">{t('home_balance')}</span>
-          <AnimatedNumber id="cBalance" className="count" value={152430.5} kind="money" />
+          {state.hideBalances
+            ? <span className="count" id="cBalance">••••••</span>
+            : <AnimatedNumber id="cBalance" className="count" value={account.balance} kind="money" />}
           <span className="note">{t('home_balance_note')}</span>
         </div>
       </div>
+
+      <section className="section-block reveal" aria-labelledby="acctTitle">
+        <AccountCards />
+      </section>
 
       <section className="resume card reveal" aria-labelledby="resumeEyebrow">
         <div>
@@ -75,10 +84,10 @@ export function HomePage({ active }: { active: boolean }) {
       </section>
 
       <div className="kpis reveal">
-        <div className="card kpi lift"><span>{t('home_income')}</span><AnimatedNumber className="count" id="cIncome" value={45000} kind="money" /><em className="up">{t('home_income_note')}</em></div>
-        <div className="card kpi lift"><span>{t('home_expenses')}</span><AnimatedNumber className="count" id="cExpense" value={28760} kind="money" /><em className="down">{t('home_expense_note')}</em></div>
-        <div className="card kpi lift"><span>{t('home_net')}</span><AnimatedNumber className="count" id="cNet" value={16240} kind="money" /><em>{t('home_net_note')}</em></div>
-        <div className="card kpi lift"><span>{t('home_rate')}</span><AnimatedNumber className="count" id="cRate" value={36} kind="pct" /><em>{t('home_rate_note')}</em></div>
+        <div className="card kpi lift"><span>{t('home_income')}</span><AnimatedNumber className="count" id="cIncome" value={account.income} kind="money" /><em className="up">{t('home_income_note')}</em></div>
+        <div className="card kpi lift"><span>{t('home_expenses')}</span><AnimatedNumber className="count" id="cExpense" value={account.expense} kind="money" /><em className="down">{t('home_expense_note')}</em></div>
+        <div className="card kpi lift"><span>{t('home_net')}</span><AnimatedNumber className="count" id="cNet" value={netOf(account)} kind="money" /><em>{t('home_net_note')}</em></div>
+        <div className="card kpi lift"><span>{t('home_rate')}</span><AnimatedNumber className="count" id="cRate" value={savingsRateOf(account)} kind="pct" /><em>{t('home_rate_note')}</em></div>
       </div>
 
       <div className="grid grid-2 home-grid">
@@ -101,7 +110,7 @@ export function HomePage({ active }: { active: boolean }) {
           <CashFlowChart flow={FLOW} months={state.range} active={active} />
         </article>
 
-        <article className="card reveal goal-card" aria-labelledby="goalTitle" ref={goalCardRef}>
+        {goal && <article className="card reveal goal-card" aria-labelledby="goalTitle" ref={goalCardRef}>
           <div className="goal-title">
             <h2 id="goalTitle">{goalName(goal, t)}</h2>
             <span className="pill blue">{t('home_goal_tag')}</span>
@@ -120,7 +129,7 @@ export function HomePage({ active }: { active: boolean }) {
             onClick={() => simulate(goal.id, 500)}>{t('goal_add')}</button>
           <button className="btn text" type="button" onClick={() => navigate('goals')} style={{ marginTop: 8 }}>{t('goals_all')}</button>
           <p className="micro">{t('sim_note')}</p>
-        </article>
+        </article>}
       </div>
 
       <section className="section-block reveal" aria-labelledby="quickTitle">

@@ -3,6 +3,7 @@ import { SKELETON_ROUTES, useRoute, type Route } from './router';
 import { SpriteSheet } from '../components/icons/Icon';
 import { Toast } from '../components/feedback/Toast';
 import { AppHeader, BottomNav, NavProgress, SiteFooter, SkipLink, Splash } from '../components/layout/Shell';
+import { SkyBackground } from '../components/layout/Sky';
 import { ViewStateContext } from '../components/layout/View';
 import { HomePage } from '../features/home/HomePage';
 import { ServicesPage } from '../features/services/ServicesPage';
@@ -78,6 +79,7 @@ export function App() {
     <>
       <SpriteSheet />
       <Splash />
+      <SkyBackground />
       <SkipLink />
       <NavProgress route={route} />
       <AppHeader route={route} />
@@ -94,8 +96,8 @@ export function App() {
           <PlaygroundPage />
           <ContactPage />
           <BrandPage />
-          <SiteFooter />
         </main>
+        <SiteFooter />
       </ViewStateContext.Provider>
       <BottomNav route={route} />
       <Toast />

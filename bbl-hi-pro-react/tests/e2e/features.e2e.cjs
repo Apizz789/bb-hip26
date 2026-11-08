@@ -203,16 +203,16 @@ runSuite('features (existing behaviour without E2E coverage)', async ({ check, s
   });
 
   // ---------- Playground ----------
-  await step('playground: Coming Soon state with no working controls except navigation back', async () => {
+  await step('playground: the 3D zoo in an iframe, then the nav returns home', async () => {
     const p = await newPage({ viewport: { width: 1280, height: 900 } });
     await go(p, 'playground');
     check('title is Financial Playground', (await p.textContent('#pgTitle')).trim() === 'Financial Playground');
-    check('"Coming soon" label is shown', (await p.locator('#playground').textContent()).includes(TH.soon));
-    check('placeholder heading is shown', await p.getByRole('heading', { name: TH.playHeading }).isVisible());
-    check('no inputs, selects or text areas', await p.locator('#playground input, #playground select, #playground textarea').count() === 0);
-    check('the only action is back to home', await p.locator('#playground button').count() === 1);
-    await p.getByRole('button', { name: TH.back }).click();
+    check('the zoo iframe is shown', await p.locator('#playground iframe.pg-zoo-frame').count() === 1);
+    check('the iframe loads zoo/index.html', (await p.getAttribute('#playground iframe.pg-zoo-frame', 'src')) === 'zoo/index.html');
+    check('the iframe has an accessible title', (await p.getAttribute('#playground iframe.pg-zoo-frame', 'title')) === 'Financial Playground');
+    check('no "Coming soon" label on the page', !(await p.locator('#playground').textContent()).includes(TH.soon));
+    await p.locator('.main-nav [data-nav="home"]').first().click();
     await settle(p, 'home');
-    check('"back to home" opens the home page', true);
+    check('the nav returns to home', true);
   });
 });

@@ -134,7 +134,7 @@ export function AppHeader({ route }: { route: Route }) {
               aria-current={parent === item.route ? 'page' : undefined}>{t(item.key)}</a>
           ))}
           <a href="#playground" data-nav="playground" className={parent === 'playground' ? 'active' : undefined}>
-            <span>{t('nav_playground')}</span><span className="soon-tag">{t('soon')}</span>
+            <span>{t('nav_playground')}</span>
           </a>
         </nav>
 
@@ -170,12 +170,14 @@ export function SiteFooter() {
   const { t } = useLang();
   return (
     <footer className="site-foot">
+      <div className="container site-foot-in">
       <span className="foot-brand"><BrandMark className="bm-s" /><b>BBL HI PRO</b></span>
       <span>{t('footer_mock')}</span>
       <nav aria-label="Footer">
         <a href="#brand">{t('footer_brand')}</a>
         <a href="#contact">{t('nav_contact')}</a>
       </nav>
+      </div>
     </footer>
   );
 }
