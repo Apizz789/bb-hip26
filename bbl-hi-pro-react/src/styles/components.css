@@ -608,8 +608,8 @@
 .site-foot nav{display:flex;gap:16px}
 .site-foot a:hover{color:var(--navy);text-decoration:underline}
 
-/* Financial Playground: the zoo frame fills the space under the page heading and above the footer. */
-.pg-zoo-frame{display:block;width:100%;height:calc(100vh - 330px - var(--page-top));height:calc(100dvh - 330px - var(--page-top));min-height:calc(520px - var(--page-top));border:0;border-radius:16px;background:#BFE9FF}
+/* Financial Playground: the zoo frame fills the space under the page heading and above the footer, and grows to the zoo's full content (--zoo-content, set by PlaygroundPage). */
+.pg-zoo-frame{display:block;width:100%;height:calc(100vh - 330px - var(--page-top));height:calc(100dvh - 330px - var(--page-top));min-height:max(calc(520px - var(--page-top)), var(--zoo-content, 0px));border:0;border-radius:16px;background:#BFE9FF}
 @media (max-width:959px){.pg-zoo-frame{height:calc(100vh - 380px - var(--page-top));height:calc(100dvh - 380px - var(--page-top))}}
 
 /* Day / night backdrop: light, calm, decorative. Fixed behind the page; never intercepts input. */
