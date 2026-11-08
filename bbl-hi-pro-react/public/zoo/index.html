@@ -4,14 +4,16 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="format-detection" content="telephone=no">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;600;700;800&display=swap" rel="stylesheet">
 <title>Financial Playground — Zoo 3D (Preview v10.13)</title>
 <style>
+@font-face{font-family:"BBL Sans";src:url("../fonts/BBLSans-Light.ttf") format("truetype");font-weight:300;font-style:normal;font-display:swap}
+@font-face{font-family:"BBL Sans";src:url("../fonts/BBLSans-Regular.ttf") format("truetype");font-weight:400;font-style:normal;font-display:swap}
+@font-face{font-family:"BBL Sans";src:url("../fonts/BBLSans-Medium.ttf") format("truetype");font-weight:500;font-style:normal;font-display:swap}
+@font-face{font-family:"BBL Sans";src:url("../fonts/BBLSans-Bold.ttf") format("truetype");font-weight:700;font-style:normal;font-display:swap}
+
   :root{ --blue:#1E5AA8; --blue-soft:#E7F0FB; --ink:#1B2535; --muted:#5F6B7E; --line:#E3E8F0; --green:#3FB58A; --radius:18px; }
   *{box-sizing:border-box}
-  body{margin:0;font-family:"Noto Sans Thai","Manrope",system-ui,sans-serif;color:var(--ink);background:#F4F8FB;line-height:1.5;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-user-drag:none}
+  body{margin:0;font-family:"BBL Sans",system-ui,sans-serif;color:var(--ink);background:#F4F8FB;line-height:1.5;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-user-drag:none}
   input,textarea{-webkit-user-select:text;user-select:text;-webkit-touch-callout:default}
   img,canvas{-webkit-user-drag:none;-webkit-touch-callout:none}
   header{background:linear-gradient(90deg,#1E5AA8,#2A7FD0);color:#fff;padding:14px 16px}
@@ -164,7 +166,7 @@
   .say-tail{width:0;height:0;border-left:8px solid transparent;border-right:8px solid transparent;border-top:9px solid #fff;filter:drop-shadow(0 2px 1px rgba(20,40,70,.12))}
   .say.hungry .say-tail{border-top-color:#FFF4D6}
   .zzz{position:absolute;left:0;top:0;width:0;height:0}
-  .zzz span{position:absolute;left:0;top:0;font-weight:800;color:#4B5B73;opacity:0;font-family:"Noto Sans Thai",sans-serif;animation:zfloat 2.8s ease-in infinite both;white-space:nowrap}
+  .zzz span{position:absolute;left:0;top:0;font-weight:800;color:#4B5B73;opacity:0;font-family:"BBL Sans",sans-serif;animation:zfloat 2.8s ease-in infinite both;white-space:nowrap}
   .zzz span:nth-child(1){font-size:14px}
   .zzz span:nth-child(2){font-size:18px;left:6px;animation-delay:.9s}
   .zzz span:nth-child(3){font-size:22px;left:12px;animation-delay:1.8s}
@@ -1758,7 +1760,7 @@ function distanceTex(text) {
   g.fillStyle = '#2F6E4E'; g.fillRect(0, 0, 256, 128);
   g.strokeStyle = '#FFD166'; g.lineWidth = 6; g.strokeRect(8, 8, 240, 112);
   g.fillStyle = '#FFFFFF'; g.textAlign = 'center'; g.textBaseline = 'middle';
-  g.font = '800 54px "Noto Sans Thai", Thonburi, Tahoma, sans-serif';
+  g.font = '800 54px "BBL Sans", Thonburi, Tahoma, sans-serif';
   g.fillText(text, 128, 66);
   const tex = new THREE.CanvasTexture(c);
   tex.colorSpace = THREE.SRGBColorSpace;
@@ -2097,7 +2099,7 @@ function addPath(pts, mat, kerbMat) {
 function drawSignLine(g, text, weight, maxPx, maxWidth, maxHeight, cy) {
   let px = maxPx, m;
   // a named Thai fallback (Thonburi is on iPad and Mac), so the sign never gets a random system font while the web font loads
-  const setFont = () => { g.font = weight + ' ' + px + 'px "Noto Sans Thai", Thonburi, Tahoma, sans-serif'; };
+  const setFont = () => { g.font = weight + ' ' + px + 'px "BBL Sans", Thonburi, Tahoma, sans-serif'; };
   const inkUp = () => m.actualBoundingBoxAscent || px * 0.9;
   const inkDown = () => m.actualBoundingBoxDescent || px * 0.3;
   setFont(); m = g.measureText(text);
@@ -2166,8 +2168,8 @@ function refreshSigns() {
   }
 }
 if (document.fonts && document.fonts.load) {
-  document.fonts.load('800 96px "Noto Sans Thai"').then(refreshSigns, () => {});
-  document.fonts.load('700 52px "Noto Sans Thai"').then(refreshSigns, () => {});
+  document.fonts.load('800 96px "BBL Sans"').then(refreshSigns, () => {});
+  document.fonts.load('700 52px "BBL Sans"').then(refreshSigns, () => {});
 }
 
 /* ---- weather: rain streaks, drifting cloud shadows, and snow flurries in patches over the polar zone ---- */
@@ -3824,7 +3826,7 @@ function celebrate(ev) {
    The picture never shows a savings amount. ---- */
 const SHARE = { want: false, snap: null, zone: 'all', ids: [], blob: null, url: null };
 let shareCtx = null;                              // the animals that were just unlocked, for the share button on the unlock card
-const THAI_FONT = '"Noto Sans Thai", Tahoma, sans-serif';
+const THAI_FONT = '"BBL Sans", Tahoma, sans-serif';
 const EMOJI_FONT = '"Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif';
 function shareName() { return ($('share-user').value.trim() || 'ผู้เล่น').slice(0, 20); }
 function shareFeel() { return clampFeeling($('share-feel').value); }

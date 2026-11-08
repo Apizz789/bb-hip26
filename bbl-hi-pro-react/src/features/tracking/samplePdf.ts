@@ -7,7 +7,7 @@ export interface SampleDoc { ref: string; title: string; date: string; lang: Lan
 
 const W = 1240; // A4 at 150 dpi
 const H = 1754;
-const font = (weight: number, size: number) => `${weight} ${size}px "Noto Sans Thai", "Manrope", system-ui, sans-serif`;
+const font = (weight: number, size: number) => `${weight} ${size}px "BBL Sans", system-ui, sans-serif`;
 
 function drawPage(doc: SampleDoc): HTMLCanvasElement {
   const L = doc.lang;
@@ -79,8 +79,8 @@ function drawPage(doc: SampleDoc): HTMLCanvasElement {
 /** Builds the PDF and starts a download. The file is watermarked as a simulated sample. */
 export async function downloadSamplePdf(doc: SampleDoc): Promise<void> {
   try {
-    await document.fonts.load('700 40px "Noto Sans Thai"');
-    await document.fonts.load('400 28px "Noto Sans Thai"');
+    await document.fonts.load('700 40px "BBL Sans"');
+    await document.fonts.load('400 28px "BBL Sans"');
   } catch {
     // Fall back to the browser's own Thai-capable fonts.
   }
