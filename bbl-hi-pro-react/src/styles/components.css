@@ -99,7 +99,9 @@
   /* =========================================================
      Views & transitions
      ========================================================= */
-  main{padding:28px 0 56px;min-height:calc(100vh - 160px)}
+  /* Top space under the sticky header, the same on every page. ID selector so .container's shorthand cannot reset it. */
+  :root{--page-top:28px}
+  #app{padding-top:var(--page-top);min-height:calc(100vh - 160px)}
   .view{display:none;scroll-margin-top:84px}
   .view.active{display:block;animation:viewIn .5s var(--ease)}
   @keyframes viewIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
@@ -500,7 +502,7 @@
     .header-inner{gap:14px}
   }
   @media (min-width:960px){
-    main{padding-top:36px}
+    :root{--page-top:36px}
     .container{padding:0 32px}
     .grid-2{grid-template-columns:1.4fr 1fr}
     .grid-3{grid-template-columns:repeat(3,1fr)}
@@ -523,7 +525,7 @@
     .wordmark{min-width:0}
     .lang-btn{padding:6px 9px}
     body{padding-bottom:88px}
-    main{padding-top:20px}
+    :root{--page-top:20px}
     .chart{height:200px}
     .month-nav strong{min-width:140px;font-size:0.9375rem}
     .facts div{grid-template-columns:90px 1fr}
@@ -607,8 +609,8 @@
 .site-foot a:hover{color:var(--navy);text-decoration:underline}
 
 /* Financial Playground: the zoo frame fills the space under the page heading and above the footer. */
-.pg-zoo-frame{display:block;width:100%;height:calc(100vh - 330px);height:calc(100dvh - 330px);min-height:520px;border:0;border-radius:16px;background:#BFE9FF}
-@media (max-width:959px){.pg-zoo-frame{height:calc(100vh - 380px);height:calc(100dvh - 380px)}}
+.pg-zoo-frame{display:block;width:100%;height:calc(100vh - 330px - var(--page-top));height:calc(100dvh - 330px - var(--page-top));min-height:calc(520px - var(--page-top));border:0;border-radius:16px;background:#BFE9FF}
+@media (max-width:959px){.pg-zoo-frame{height:calc(100vh - 380px - var(--page-top));height:calc(100dvh - 380px - var(--page-top))}}
 
 /* Day / night backdrop: light, calm, decorative. Fixed behind the page; never intercepts input. */
 .sky{position:fixed;left:0;right:0;top:0;height:420px;z-index:-1;pointer-events:none}
