@@ -446,9 +446,6 @@
   .brand-note{font-size:0.8125rem;color:var(--muted);border-left:3px solid var(--gold);padding:6px 0 6px 14px}
 
   /* Footer */
-  .site-foot{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-top:40px;padding-top:20px;border-top:1px solid var(--line);font-size:0.8125rem;color:var(--faint)}
-  .site-foot nav{display:flex;gap:16px}
-  .site-foot a:hover{color:var(--navy);text-decoration:underline}
 
   /* Modal */
   .modal{position:fixed;inset:0;z-index:80;background:rgba(14,28,56,.42);display:grid;place-items:center;padding:16px;backdrop-filter:blur(3px);animation:fadeIn .25s var(--ease)}
@@ -599,4 +596,37 @@
   .h3-look{font-size:1rem}
 
 /* Financial Playground: the 3D zoo page (public/zoo/index.html) in an iframe. */
-.pg-zoo-frame{display:block;width:100%;height:min(82vh,760px);min-height:520px;border:0;border-radius:16px;background:#BFE9FF}
+
+/* Footer: pinned to the bottom of the viewport on every page. Content scrolls above it, never under the nav on mobile. */
+:root{--foot-h:56px;--bn-h:0px}
+@media (max-width:959px){:root{--bn-h:76px}}
+#app{padding-bottom:calc(var(--foot-h) + var(--bn-h) + 24px)}
+.site-foot{position:fixed;left:0;right:0;bottom:var(--bn-h);z-index:30;background:rgba(246,245,240,.96);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);border-top:1px solid var(--line);font-size:0.8125rem;color:var(--faint)}
+.site-foot-in{display:flex;justify-content:space-between;align-items:center;gap:6px 12px;flex-wrap:wrap;min-height:var(--foot-h);padding-top:8px;padding-bottom:8px}
+.site-foot nav{display:flex;gap:16px}
+.site-foot a:hover{color:var(--navy);text-decoration:underline}
+
+/* Financial Playground: the zoo frame fills the space under the page heading and above the footer. */
+.pg-zoo-frame{display:block;width:100%;height:calc(100vh - 330px);height:calc(100dvh - 330px);min-height:520px;border:0;border-radius:16px;background:#BFE9FF}
+@media (max-width:959px){.pg-zoo-frame{height:calc(100vh - 380px);height:calc(100dvh - 380px)}}
+
+/* Day / night backdrop: light, calm, decorative. Fixed behind the page; never intercepts input. */
+.sky{position:fixed;left:0;right:0;top:0;height:420px;z-index:-1;pointer-events:none}
+.sky svg{width:100%;height:100%;display:block}
+.sky-top{stop-color:#E4EEF9}
+.sky-bottom{stop-color:var(--paper)}
+.sky-day .sky-top{stop-color:#DCEBF8}
+.sky-day .sky-sun{fill:#F3CF7A;opacity:.55}
+.sky-dusk .sky-top{stop-color:#F6E2CC}
+.sky-dusk .sky-sun{fill:#F0B36A;opacity:.6}
+.sky-night .sky-top{stop-color:#D9E2F0}
+.sky-night .sky-moon{fill:#F4F6FA;opacity:.85}
+.sky-night .sky-stars circle{fill:#1F3F7A;opacity:.35}
+
+/* Hover feedback only (no looping motion); off when reduced motion is requested. */
+@media (hover:hover) and (prefers-reduced-motion:no-preference){
+  .rec,.goal-item:not(.lift){transition:transform .25s var(--ease),box-shadow .25s var(--ease)}
+  .rec:hover,.goal-item:not(.lift):hover{transform:translateY(-2px);box-shadow:var(--shadow-hover)}
+  .spend-row,.insight{transition:background .2s}
+  .spend-row:hover,.insight:hover{background:#FBFBF8}
+}

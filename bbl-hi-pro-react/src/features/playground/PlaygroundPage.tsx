@@ -1,7 +1,24 @@
+import type { SyntheticEvent } from 'react';
 import { View } from '../../components/layout/View';
 import { useLang } from '../../app/LanguageProvider';
 
-/** Financial Playground: the 3D zoo (public/zoo/index.html, locked at v10.13), a self-contained page with its own simulated state. */
+/** Applied inside the zoo document (same origin) so the zoo never shows its own scrollbar; the frame gives it the space. */
+const EMBED_CSS = 'html,body{margin:0!important;height:100%!important;overflow:hidden!important}';
+
+function lockScroll(e: SyntheticEvent<HTMLIFrameElement>) {
+  try {
+    const doc = e.currentTarget.contentDocument;
+    if (!doc || doc.getElementById('embed-lock')) return;
+    const style = doc.createElement('style');
+    style.id = 'embed-lock';
+    style.textContent = EMBED_CSS;
+    doc.head.appendChild(style);
+  } catch {
+    // Blocked or cross-origin: the zoo still works, it just keeps its own scrollbar.
+  }
+}
+
+/** Financial Playground: the 3D zoo (public/zoo/index.html, locked at v10.13) fills the page area. */
 export function PlaygroundPage() {
   const { t } = useLang();
   return (
@@ -13,7 +30,7 @@ export function PlaygroundPage() {
         </div>
       </div>
       <div className="reveal">
-        <iframe className="pg-zoo-frame" src="zoo/index.html" title={t('pg_title')} loading="lazy" />
+        <iframe className="pg-zoo-frame" src="zoo/index.html" title={t('pg_title')} loading="lazy" onLoad={lockScroll} />
       </div>
     </View>
   );

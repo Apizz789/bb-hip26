@@ -170,12 +170,14 @@ export function SiteFooter() {
   const { t } = useLang();
   return (
     <footer className="site-foot">
+      <div className="container site-foot-in">
       <span className="foot-brand"><BrandMark className="bm-s" /><b>BBL HI PRO</b></span>
       <span>{t('footer_mock')}</span>
       <nav aria-label="Footer">
         <a href="#brand">{t('footer_brand')}</a>
         <a href="#contact">{t('nav_contact')}</a>
       </nav>
+      </div>
     </footer>
   );
 }
